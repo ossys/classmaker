@@ -364,6 +364,9 @@ public class JavaAttributeGenerator extends AttributeGenerator {
 				}
 			}
 			sb.append(";\n");
+			if(this.annotations.size() > 0) {
+				sb.append("\n");
+			}
 		}
 	}
 	
