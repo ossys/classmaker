@@ -42,6 +42,7 @@ public class JavaAttributeGenerator extends AttributeGenerator {
 	private List<String> instantiation_parameters = null;
 	
 	private boolean instantiate_complex_type = false;
+	private String complex_instantiator = null;
 	
 	public JavaAttributeGenerator(String name, ClassGenerator.NamingSyntaxType namingSyntaxType) {
 		super(name, namingSyntaxType);
@@ -69,6 +70,10 @@ public class JavaAttributeGenerator extends AttributeGenerator {
 	
 	public void instantiateComplexType() {
 		this.instantiate_complex_type = true;
+	}
+	
+	public void setComplexInstantiator(String complex_instantiator) {
+		this.complex_instantiator = complex_instantiator;
 	}
 	
 	public void addAnnotation(String annotation) {
@@ -325,7 +330,9 @@ public class JavaAttributeGenerator extends AttributeGenerator {
 						break;
 				}
 			} else if(this.complexType != null) {
-				if(this.instantiate_complex_type) {
+				if(this.complex_instantiator != null) {
+					sb.append(" = " + this.complex_instantiator);
+				} else if(this.instantiate_complex_type) {
 					if(this.complexType != null && this.implementationType == null) {
 						if(this.dflt == null) {
 							sb.append(" = new " + this.complexType);
