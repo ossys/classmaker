@@ -16,6 +16,8 @@ public class MethodGenerator implements MethodGeneratorInterface {
 	protected StringBuilder code = new StringBuilder();
 
 	protected String name = "";
+	protected String verb = null;
+	protected String adjective = null;
 	
 	protected boolean constructor = false;
 	protected boolean getter = false;
@@ -45,6 +47,10 @@ public class MethodGenerator implements MethodGeneratorInterface {
 	
 	public void setVisibility(MethodVisibilityType visibilityType) {
 		this.visibilityType = visibilityType;
+	}
+	
+	public void setVerb(String verb) {
+		this.verb = verb;
 	}
 	
 	public void setStatic() {

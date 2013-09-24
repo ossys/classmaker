@@ -206,19 +206,23 @@ public class JavaAttributeGenerator extends AttributeGenerator {
 			}
 		} else {
 			sb.append(this.complexType);
-			if(this.generics.size() > 0) {
-				sb.append("<");
-			}
-			int cnt = 0;
-			for(String generic : this.generics) {
-				if(cnt>0) {
-					sb.append(", ");
+			if(this.is_array) {
+				sb.append("[]");
+			} else {
+				if(this.generics.size() > 0) {
+					sb.append("<");
 				}
-				sb.append(generic);
-				cnt++;
-			}
-			if(this.generics.size() > 0) {
-				sb.append(">");
+				int cnt = 0;
+				for(String generic : this.generics) {
+					if(cnt>0) {
+						sb.append(", ");
+					}
+					sb.append(generic);
+					cnt++;
+				}
+				if(this.generics.size() > 0) {
+					sb.append(">");
+				}
 			}
 			sb.append(" ");
 		}
