@@ -1,7 +1,7 @@
 package main;
 
-import com.purlogic.classmaker.sourcegenerator.classgenerator.PhpClassGenerator;
-import com.purlogic.classmaker.sourcegenerator.methodgenerator.PhpMethodGenerator;
+import com.ossys.classmaker.sourcegenerator.classgenerator.PhpClassGenerator;
+import com.ossys.classmaker.sourcegenerator.methodgenerator.PhpMethodGenerator;
 
 public class RunPHPGeneration {
 

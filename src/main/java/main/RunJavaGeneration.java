@@ -1,11 +1,11 @@
 package main;
 
-import com.purlogic.classmaker.sourcegenerator.attributegenerator.JavaAttributeGenerator;
-import com.purlogic.classmaker.sourcegenerator.attributegenerator.JavaAttributeGenerator.PrimitiveType;
-import com.purlogic.classmaker.sourcegenerator.classgenerator.ClassGenerator;
-import com.purlogic.classmaker.sourcegenerator.classgenerator.JavaClassGenerator;
-import com.purlogic.classmaker.sourcegenerator.classgenerator.JavaInterfaceGenerator;
-import com.purlogic.classmaker.sourcegenerator.methodgenerator.JavaMethodGenerator;
+import com.ossys.classmaker.sourcegenerator.attributegenerator.JavaAttributeGenerator;
+import com.ossys.classmaker.sourcegenerator.attributegenerator.JavaAttributeGenerator.PrimitiveType;
+import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator;
+import com.ossys.classmaker.sourcegenerator.classgenerator.JavaClassGenerator;
+import com.ossys.classmaker.sourcegenerator.classgenerator.JavaInterfaceGenerator;
+import com.ossys.classmaker.sourcegenerator.methodgenerator.JavaMethodGenerator;
 
 public class RunJavaGeneration {
 

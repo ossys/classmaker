@@ -1,8 +1,8 @@
 package main;
 
-import com.purlogic.classmaker.modelgenerator.xml.XMLAttributeGenerator;
-import com.purlogic.classmaker.modelgenerator.xml.XMLElementGenerator;
-import com.purlogic.classmaker.modelgenerator.xml.XMLModelGenerator;
+import com.ossys.classmaker.modelgenerator.xml.XMLAttributeGenerator;
+import com.ossys.classmaker.modelgenerator.xml.XMLElementGenerator;
+import com.ossys.classmaker.modelgenerator.xml.XMLModelGenerator;
 
 
 public class RunXMLGeneration {

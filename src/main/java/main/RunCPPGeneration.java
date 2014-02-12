@@ -1,15 +1,15 @@
 package main;
 
-import com.purlogic.classmaker.sourcegenerator.attributegenerator.AttributeGenerator.AttributeVisibilityType;
-import com.purlogic.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator;
-import com.purlogic.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.AttributeSignage;
-import com.purlogic.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.PrimitiveType;
-import com.purlogic.classmaker.sourcegenerator.classgenerator.ClassGenerator;
-import com.purlogic.classmaker.sourcegenerator.classgenerator.CppClassGenerator;
-import com.purlogic.classmaker.sourcegenerator.classgenerator.CppClassGenerator.LibraryType;
-import com.purlogic.classmaker.sourcegenerator.methodgenerator.CppMethodGenerator;
-import com.purlogic.classmaker.sourcegenerator.methodgenerator.CppMethodGenerator.ReturnType;
-import com.purlogic.classmaker.sourcegenerator.methodgenerator.MethodGenerator.MethodVisibilityType;
+import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator;
+import com.ossys.classmaker.sourcegenerator.attributegenerator.AttributeGenerator.AttributeVisibilityType;
+import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.AttributeSignage;
+import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.PrimitiveType;
+import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator;
+import com.ossys.classmaker.sourcegenerator.classgenerator.CppClassGenerator;
+import com.ossys.classmaker.sourcegenerator.classgenerator.CppClassGenerator.LibraryType;
+import com.ossys.classmaker.sourcegenerator.methodgenerator.CppMethodGenerator;
+import com.ossys.classmaker.sourcegenerator.methodgenerator.CppMethodGenerator.ReturnType;
+import com.ossys.classmaker.sourcegenerator.methodgenerator.MethodGenerator.MethodVisibilityType;
 
 public class RunCPPGeneration {
 
