@@ -7,8 +7,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -118,8 +116,8 @@ public class ClassGenerator implements ClassGeneratorInterface {
 	}
 	
 	public int getLinesOfCode() {
-		Matcher m = Pattern.compile("\n|\r").matcher(sb.toString());
-		int cnt = 1;
+		Matcher m = Pattern.compile("^(?![ \\s]*\\r?\\n|import|package|[ \\s]*}\\r?\\n|[ \\s]*//|[ \\s]*/\\*|[ \\s]*\\*).*\\r?\\n").matcher(sb.toString());
+		int cnt = 0;
 		while(m.find()) {
 			cnt++;
 		}

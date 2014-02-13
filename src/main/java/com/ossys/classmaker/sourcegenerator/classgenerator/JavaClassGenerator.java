@@ -17,6 +17,7 @@ import com.ossys.classmaker.sourcegenerator.methodgenerator.JavaMethodGenerator.
  */
 public class JavaClassGenerator extends ClassGenerator {
 	private String pkg = null;
+	private boolean subclass = false;
 	
 	private List<JavaAttributeGenerator> attributes = new ArrayList<JavaAttributeGenerator>();
 	private List<String> annotations = new ArrayList<String>();
@@ -78,11 +79,19 @@ public class JavaClassGenerator extends ClassGenerator {
 		return this.sb.toString();
 	}
 	
+	public void setSubclass(boolean subclass) {
+		this.subclass = subclass;
+	}
+	
+	public boolean getSubclass() {
+		return this.subclass;
+	}
+	
 	private void generate() {
 		this.sb = new StringBuilder();
 		
 		// Setting class package
-		if(this.pkg != null) {
+		if(this.pkg != null && !this.subclass) {
 			if(!this.pkg.equalsIgnoreCase("")) {
 				this.sb.append("package " + this.pkg + ";\n\n");
 			}
@@ -189,7 +198,8 @@ public class JavaClassGenerator extends ClassGenerator {
 		
 		// Subclasses
 		for(JavaClassGenerator jcg : this.subclasses) {
-			this.sb.append(jcg.toString() + "\n");
+			jcg.setSubclass(true);
+			this.sb.append(jcg.getSource() + "\n");
 		}
 		
 		// End Class
@@ -221,16 +231,20 @@ public class JavaClassGenerator extends ClassGenerator {
 			StringBuilder sb = new StringBuilder();
 			
 			sb.append("\t");
-			switch(jag.getVisibilityType()) {
-				case PRIVATE:
-					sb.append("private");
-					break;
-				case PROTECTED:
-					sb.append("protected");
-					break;
-				case PUBLIC:
-					sb.append("public");
-					break;
+			if(jag.getVisibilityType() != null) {
+				switch(jag.getVisibilityType()) {
+					case PRIVATE:
+						sb.append("private");
+						break;
+					case PROTECTED:
+						sb.append("protected");
+						break;
+					case PUBLIC:
+						sb.append("public");
+						break;
+				}
+			} else {
+				sb.append("private");
 			}
 			
 			if(jag.isStatic()) {
