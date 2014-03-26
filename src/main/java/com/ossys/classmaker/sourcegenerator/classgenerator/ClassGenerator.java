@@ -19,6 +19,7 @@ public class ClassGenerator implements ClassGeneratorInterface {
 	
 	protected String name = "";
 	protected String path = null;
+	protected boolean stc = false;
 	protected ArrayList<String> libraries = new ArrayList<String>();
 	protected ArrayList<String> extended_classes = new ArrayList<String>();
 	protected StringBuilder comment = new StringBuilder();
@@ -99,8 +100,20 @@ public class ClassGenerator implements ClassGeneratorInterface {
 		return "\n";
 	}
 	
+	public void setStatic() {
+		this.stc = true;
+	}
+	
+	public boolean isStatic() {
+		return this.stc;
+	}
+	
 	public void setVisibility(ClassVisibilityType visibilityType) {
 		this.visibilityType = visibilityType;
+	}
+	
+	public ClassVisibilityType getVisibility() {
+		return this.visibilityType;
 	}
 	
 	public String getOriginalName() {

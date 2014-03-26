@@ -259,7 +259,9 @@ public class JavaClassGenerator extends ClassGenerator {
 				sb.append(ClassGenerator.getName("\n\t\t" + type, ClassGenerator.NamingSyntaxType.UPPERCASE, false));
 				cnt++;
 			}
-			sb.append("\n\t}\n");
+			
+			//TODO: This should not be hard-coded into the Enum, but instead needs to be added as an attribute via API
+			sb.append(";\n\n\t\tpublic static final " + ClassGenerator.getName(jag.getOriginalName(), NamingSyntaxType.PASCAL, false) + "[] value = " + ClassGenerator.getName(jag.getOriginalName(), NamingSyntaxType.PASCAL, false) + ".values();\n\t}\n");
 			
 			return sb.toString();
 		}
