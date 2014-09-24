@@ -1,5 +1,6 @@
 package com.ossys.classmaker.modelgenerator.xml;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -21,6 +22,14 @@ public class ModelGenerator {
 	
 	public void setFileExtension(String file_extension) {
 		this.file_extension = file_extension;
+	}
+	
+	public boolean exists() {
+		if(this.file_extension == null) {
+			this.file_extension = ".xml";
+		}
+		File file = new File(this.path + System.getProperty("file.separator") + this.filename + this.file_extension);
+		return file.exists();
 	}
 	
 	public boolean save() {

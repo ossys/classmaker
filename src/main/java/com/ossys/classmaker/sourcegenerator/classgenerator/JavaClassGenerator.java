@@ -87,9 +87,13 @@ public class JavaClassGenerator extends ClassGenerator {
 		return this.subclass;
 	}
 	
+	public String getPackage() {
+		return this.pkg;
+	}
+	
 	private void generate() {
 		this.sb = new StringBuilder();
-		
+
 		// Setting class package
 		if(this.pkg != null && !this.subclass) {
 			if(!this.pkg.equalsIgnoreCase("")) {
