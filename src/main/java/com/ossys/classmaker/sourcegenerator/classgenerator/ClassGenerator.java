@@ -18,6 +18,7 @@ public class ClassGenerator implements ClassGeneratorInterface {
 	StringBuilder sb = new StringBuilder();
 	
 	protected String name = "";
+	protected String extension = "";
 	protected String path = null;
 	protected boolean stc = false;
 	protected ArrayList<String> libraries = new ArrayList<String>();
@@ -100,6 +101,10 @@ public class ClassGenerator implements ClassGeneratorInterface {
 		return "\n";
 	}
 	
+	public void setExtension(String extension) {
+		this.extension = extension;
+	}
+	
 	public void setStatic() {
 		this.stc = true;
 	}
@@ -125,7 +130,7 @@ public class ClassGenerator implements ClassGeneratorInterface {
 	}
 	
 	public boolean exists() {
-		return new File(this.path).exists();
+		return new File(this.path + System.getProperty("file.separator") + this.name() + "." + this.extension).exists();
 	}
 	
 	public int getLinesOfCode() {

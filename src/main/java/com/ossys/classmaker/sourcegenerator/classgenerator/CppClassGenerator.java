@@ -21,6 +21,8 @@ public class CppClassGenerator extends ClassGenerator {
 	StringBuilder sb_i = new StringBuilder();
 	
 	String root_path = "";
+	String include_path = "";
+	String include_prepend = "";
 	MethodVisibilityType default_constructor_visibility = MethodVisibilityType.PUBLIC;
 	
 	private ArrayList<CppMethodGenerator> methods = new ArrayList<CppMethodGenerator>();
@@ -133,6 +135,14 @@ public class CppClassGenerator extends ClassGenerator {
 	
 	public void setDefaultConstructorVisibility(MethodVisibilityType type) {
 		this.default_constructor_visibility = type;
+	}
+	
+	public void setIncludePath(String include_path) {
+		this.include_path = include_path;
+	}
+	
+	public void setIncludePrepend(String include_prepend) {
+		this.include_prepend = include_prepend;
 	}
 	
 	public String getHeaderSource() {
@@ -359,7 +369,7 @@ public class CppClassGenerator extends ClassGenerator {
 		
 		//CPP File
 		//Include Header File
-		this.sb_i.append("#include \"include/" + this.name + ".h\"\n\n");
+		this.sb_i.append("#include \"" + this.include_prepend + "/" + this.name + ".h\"\n\n");
 
 		for(CppAttributeGenerator attribute : CppAttributeGenerator.getGlobals()) {
 			attribute.setNamespace(this.getNamespace());
@@ -416,7 +426,7 @@ public class CppClassGenerator extends ClassGenerator {
 			
 			this.sb.delete(0, this.sb.length());
 			this.sb.append(this.sb_h);
-			this.path = this.root_path + System.getProperty("file.separator") + "include" + System.getProperty("file.separator") + ClassGenerator.getName(this.name,NamingSyntaxType.PASCAL, false) + ".h";
+			this.path = this.include_path + System.getProperty("file.separator") + ClassGenerator.getName(this.name,NamingSyntaxType.PASCAL, false) + ".h";
 			
 			if(super.save()) {
 				this.sb.delete(0, this.sb.length());
