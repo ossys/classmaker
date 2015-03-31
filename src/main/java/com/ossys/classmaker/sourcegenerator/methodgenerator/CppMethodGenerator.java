@@ -100,6 +100,7 @@ public class CppMethodGenerator extends MethodGenerator {
 	}
 	
 	public boolean isConstructor() {
+		this.classname = this.name;
 		return this.constructor;
 	}
 	
@@ -199,9 +200,9 @@ public class CppMethodGenerator extends MethodGenerator {
 			this.sb.append(";");
 		} else if(type == MethodType.IMPLEMENTATION) {
 			if(this.constructor) {
-				this.sb.append(this.namespace + ClassGenerator.getName(this.classname, NamingSyntaxType.PASCAL, false) + "::" + ClassGenerator.getClassName(this.classname));
+				this.sb.append(this.namespace + ClassGenerator.getName(this.classname, NamingSyntaxType.PASCAL, false) + "::" + ClassGenerator.getClassName(this.name));
 			} else if(this.destructor) {
-				this.sb.append(this.namespace + ClassGenerator.getName(this.classname, NamingSyntaxType.PASCAL, false) + "::~" + ClassGenerator.getClassName(this.classname));
+				this.sb.append(this.namespace + ClassGenerator.getName(this.classname, NamingSyntaxType.PASCAL, false) + "::~" + ClassGenerator.getClassName(this.name));
 			} else {
 				if((!this.constructor && !this.destructor) &&
 					this.return_type == null &&

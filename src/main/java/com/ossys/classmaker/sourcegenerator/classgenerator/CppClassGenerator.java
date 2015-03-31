@@ -308,6 +308,7 @@ public class CppClassGenerator extends ClassGenerator {
 			for(CppMethodGenerator method : this.getMethodsOfVisibilityType(MethodVisibilityType.PROTECTED)) {
 				if(method.isConstructor()) {
 					this.sb_h.append(this.getNamespaceTabs() + "\t\t" + method.getSource(MethodType.DEFINITION));
+					this.sb_h.append("\n");
 					newline = true;
 				}
 			}
@@ -332,7 +333,7 @@ public class CppClassGenerator extends ClassGenerator {
 		// Adding public attributes and methods
 		if( this.hasMethodsOfVisibilityType(MethodVisibilityType.PUBLIC) ||
 			this.hasMembersOfVisibilityType(AttributeVisibilityType.PUBLIC) ||
-			(!this.hasDefaultConstructor() && !this.hasDestructor())) {
+			(!this.hasDestructor())) {
 			
 			this.sb_h.append(this.getNamespaceTabs() + "\tpublic:\n");
 			
