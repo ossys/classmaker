@@ -1,6 +1,7 @@
 package com.ossys.classmaker.sourcegenerator.methodgenerator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.AttributeSignage;
@@ -90,6 +91,26 @@ public class CppMethodGenerator extends MethodGenerator {
 		this.arguments.add(argument);
 	}
 	
+	public List<CppAttributeGenerator> getArguments() {
+		return this.arguments;
+	}
+	
+	public boolean isDestructor() {
+		return this.destructor;
+	}
+	
+	public boolean isConstructor() {
+		return this.constructor;
+	}
+	
+	public boolean isDefaultConstructor() {
+		if(this.constructor && this.arguments.size() == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public String getSource(MethodType type) {
 		this.generate(type);
 		return this.sb.toString();
@@ -156,7 +177,7 @@ public class CppMethodGenerator extends MethodGenerator {
 				this.sb.append("~");
 			}
 			if(this.constructor || this.destructor) {
-				this.sb.append(ClassGenerator.getClassName(this.name));
+				this.sb.append(ClassGenerator.getClassName(this.classname));
 			} else {
 				this.sb.append(this.name());
 			}
@@ -175,12 +196,12 @@ public class CppMethodGenerator extends MethodGenerator {
 			if(this.constant) {
 				this.sb.append(" const");
 			}
-			this.sb.append(";\n");
+			this.sb.append(";");
 		} else if(type == MethodType.IMPLEMENTATION) {
 			if(this.constructor) {
-				this.sb.append(this.namespace + ClassGenerator.getName(this.classname, NamingSyntaxType.PASCAL, false) + "::" + ClassGenerator.getClassName(this.name));
+				this.sb.append(this.namespace + ClassGenerator.getName(this.classname, NamingSyntaxType.PASCAL, false) + "::" + ClassGenerator.getClassName(this.classname));
 			} else if(this.destructor) {
-				this.sb.append(this.namespace + ClassGenerator.getName(this.classname, NamingSyntaxType.PASCAL, false) + "::~" + ClassGenerator.getClassName(this.name));
+				this.sb.append(this.namespace + ClassGenerator.getName(this.classname, NamingSyntaxType.PASCAL, false) + "::~" + ClassGenerator.getClassName(this.classname));
 			} else {
 				if((!this.constructor && !this.destructor) &&
 					this.return_type == null &&
@@ -252,7 +273,7 @@ public class CppMethodGenerator extends MethodGenerator {
 			
 			this.sb.append(" {\n");
 			this.sb.append(this.code);
-			this.sb.append("}\n\n");
+			this.sb.append("\n}\n\n");
 		}
 	}
 	

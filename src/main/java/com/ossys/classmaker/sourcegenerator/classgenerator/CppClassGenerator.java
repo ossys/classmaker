@@ -23,7 +23,6 @@ public class CppClassGenerator extends ClassGenerator {
 	String root_path = "";
 	String include_path = "";
 	String include_prepend = "";
-	MethodVisibilityType default_constructor_visibility = MethodVisibilityType.PUBLIC;
 	
 	private ArrayList<CppMethodGenerator> methods = new ArrayList<CppMethodGenerator>();
 	private ArrayList<CppAttributeGenerator> attributes = new ArrayList<CppAttributeGenerator>();
@@ -31,6 +30,8 @@ public class CppClassGenerator extends ClassGenerator {
 	private ArrayList<String> custom_header_libraries = new ArrayList<String>();
 	private ArrayList<String> standard_implementation_libraries = new ArrayList<String>();
 	private ArrayList<String> custom_implementation_libraries = new ArrayList<String>();
+	private ArrayList<String> header_typedefs = new ArrayList<String>();
+	private ArrayList<String> implementation_typedefs = new ArrayList<String>();
 	private ArrayList<String> namespaces = new ArrayList<String>();
 	
 	public CppClassGenerator(String name, String path) {
@@ -72,6 +73,14 @@ public class CppClassGenerator extends ClassGenerator {
 	
 	public void addNamespace(String namespace) {
 		this.namespaces.add(namespace);
+	}
+	
+	public void addHeaderTypedef(String typedef) {
+		this.header_typedefs.add(typedef);
+	}
+	
+	public void addImplementationTypedef(String typedef) {
+		this.implementation_typedefs.add(typedef);
 	}
 	
 	public String getNamespace() {
@@ -133,8 +142,29 @@ public class CppClassGenerator extends ClassGenerator {
 		return methods;
 	}
 	
-	public void setDefaultConstructorVisibility(MethodVisibilityType type) {
-		this.default_constructor_visibility = type;
+	public boolean hasDefaultConstructor() {
+		for(CppMethodGenerator cppmg : this.methods) {
+			if(cppmg.isConstructor() && cppmg.getArguments().size() == 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean hasDestructor() {
+		for(CppMethodGenerator cppmg : this.methods) {
+			if(cppmg.isDestructor()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean isDefaultConstructor(CppMethodGenerator cppmg) {
+		if(cppmg.isConstructor() && cppmg.getArguments().size() == 0) {
+			return true;
+		}
+		return false;
 	}
 	
 	public void setIncludePath(String include_path) {
@@ -161,7 +191,7 @@ public class CppClassGenerator extends ClassGenerator {
 		
 		//Creating Default Constructor Method
 		CppMethodGenerator constructor = new CppMethodGenerator(this.name);
-		constructor.setVisibility(this.default_constructor_visibility);
+		constructor.setVisibility(MethodVisibilityType.PUBLIC);
 		constructor.setConstructor();
 		constructor.setNamespace(this.getNamespace());
 		constructor.setClassname(this.name);
@@ -185,7 +215,7 @@ public class CppClassGenerator extends ClassGenerator {
 		for(String custom_library : this.custom_header_libraries) {
 			this.sb_h.append("#include \"" + custom_library + "\"\n");
 		}
-		if(this.custom_header_libraries.size() > 0) {
+		if(this.standard_header_libraries.size() > 0 || this.custom_header_libraries.size() > 0) {
 			this.sb_h.append("\n");
 		}
 		
@@ -217,14 +247,14 @@ public class CppClassGenerator extends ClassGenerator {
 		this.sb_h.append(" {\n\n");
 		
 		// Adding private attributes and methods
-		if(this.default_constructor_visibility == MethodVisibilityType.PRIVATE || 
-				this.hasMethodsOfVisibilityType(MethodVisibilityType.PRIVATE) ||
-				this.hasMembersOfVisibilityType(AttributeVisibilityType.PRIVATE)) {
-			this.sb_h.append(this.getNamespaceTabs() + "private:\n");
+		if( this.hasMethodsOfVisibilityType(MethodVisibilityType.PRIVATE) ||
+			this.hasMembersOfVisibilityType(AttributeVisibilityType.PRIVATE)) {
+			
+			this.sb_h.append(this.getNamespaceTabs() + "\tprivate:\n");
 			
 			boolean newline = true;
 			for(CppAttributeGenerator attribute : this.getAttributesOfVisibilityType(AttributeVisibilityType.PRIVATE)) {
-				this.sb_h.append(this.getNamespaceTabs() + "\t" + attribute.getSource(AttributeType.DEFINITION));
+				this.sb_h.append(this.getNamespaceTabs() + "\t\t" + attribute.getSource(AttributeType.DEFINITION));
 				newline = true;
 			}
 			if(newline) {
@@ -232,15 +262,10 @@ public class CppClassGenerator extends ClassGenerator {
 				newline = false;
 			}
 
-			// Adding Default Constructor to Header
-			if(this.default_constructor_visibility == MethodVisibilityType.PRIVATE) {
-				this.sb_h.append(this.getNamespaceTabs() + "\t" + constructor.getSource(MethodType.DEFINITION));
-				newline = true;
-			}
 			// Get Non-Default Constructors
 			for(CppMethodGenerator method : this.getMethodsOfVisibilityType(MethodVisibilityType.PRIVATE)) {
 				if(method.isConstructor()) {
-					this.sb_h.append(this.getNamespaceTabs() + "\t" + method.getSource(MethodType.DEFINITION));
+					this.sb_h.append(this.getNamespaceTabs() + "\t\t" + method.getSource(MethodType.DEFINITION));
 					newline = true;
 				}
 			}
@@ -252,7 +277,7 @@ public class CppClassGenerator extends ClassGenerator {
 			// Get Remaining Methods
 			for(CppMethodGenerator method : this.getMethodsOfVisibilityType(MethodVisibilityType.PRIVATE)) {
 				if(!method.isConstructor()) {
-					this.sb_h.append(this.getNamespaceTabs() + "\t" + method.getSource(MethodType.DEFINITION));
+					this.sb_h.append(this.getNamespaceTabs() + "\t\t" + method.getSource(MethodType.DEFINITION));
 					newline = true;
 				}
 			}
@@ -263,14 +288,14 @@ public class CppClassGenerator extends ClassGenerator {
 		}
 
 		// Adding protected attributes and methods
-		if(this.default_constructor_visibility == MethodVisibilityType.PROTECTED || 
-				this.hasMethodsOfVisibilityType(MethodVisibilityType.PROTECTED) ||
-				this.hasMembersOfVisibilityType(AttributeVisibilityType.PROTECTED)) {
-			this.sb_h.append(this.getNamespaceTabs() + "protected:\n");
+		if( this.hasMethodsOfVisibilityType(MethodVisibilityType.PROTECTED) ||
+			this.hasMembersOfVisibilityType(AttributeVisibilityType.PROTECTED)) {
+			
+			this.sb_h.append(this.getNamespaceTabs() + "\tprotected:\n");
 			
 			boolean newline = false;
 			for(CppAttributeGenerator attribute : this.getAttributesOfVisibilityType(AttributeVisibilityType.PROTECTED)) {
-				this.sb_h.append(this.getNamespaceTabs() + "\t" + attribute.getSource(AttributeType.DEFINITION));
+				this.sb_h.append(this.getNamespaceTabs() + "\t\t" + attribute.getSource(AttributeType.DEFINITION));
 				newline = true;
 			}
 			if(newline) {
@@ -278,15 +303,10 @@ public class CppClassGenerator extends ClassGenerator {
 				newline = false;
 			}
 
-			// Adding Default Constructor to Header
-			if(this.default_constructor_visibility == MethodVisibilityType.PROTECTED) {
-				this.sb_h.append(this.getNamespaceTabs() + "\t" + constructor.getSource(MethodType.DEFINITION));
-				newline = true;
-			}
-			// Get Non-Default Constructors
+			// Get Custom Constructors
 			for(CppMethodGenerator method : this.getMethodsOfVisibilityType(MethodVisibilityType.PROTECTED)) {
 				if(method.isConstructor()) {
-					this.sb_h.append(this.getNamespaceTabs() + "\t" + method.getSource(MethodType.DEFINITION));
+					this.sb_h.append(this.getNamespaceTabs() + "\t\t" + method.getSource(MethodType.DEFINITION));
 					newline = true;
 				}
 			}
@@ -298,7 +318,7 @@ public class CppClassGenerator extends ClassGenerator {
 			// Get Remaining Methods
 			for(CppMethodGenerator method : this.getMethodsOfVisibilityType(MethodVisibilityType.PROTECTED)) {
 				if(!method.isConstructor()) {
-					this.sb_h.append(this.getNamespaceTabs() + "\t" + method.getSource(MethodType.DEFINITION));
+					this.sb_h.append(this.getNamespaceTabs() + "\t\t" + method.getSource(MethodType.DEFINITION));
 					newline = true;
 				}
 			}
@@ -309,14 +329,14 @@ public class CppClassGenerator extends ClassGenerator {
 		}
 		
 		// Adding public attributes and methods
-		if(this.default_constructor_visibility == MethodVisibilityType.PUBLIC || 
-			this.hasMethodsOfVisibilityType(MethodVisibilityType.PUBLIC) ||
+		if( this.hasMethodsOfVisibilityType(MethodVisibilityType.PUBLIC) ||
 			this.hasMembersOfVisibilityType(AttributeVisibilityType.PUBLIC)) {
-			this.sb_h.append(this.getNamespaceTabs() + "public:\n");
+			
+			this.sb_h.append(this.getNamespaceTabs() + "\tpublic:\n");
 			
 			boolean newline = false;
 			for(CppAttributeGenerator attribute : this.getAttributesOfVisibilityType(AttributeVisibilityType.PUBLIC)) {
-				this.sb_h.append(this.getNamespaceTabs() + "\t" + attribute.getSource(AttributeType.DEFINITION));
+				this.sb_h.append(this.getNamespaceTabs() + "\t\t" + attribute.getSource(AttributeType.DEFINITION));
 				newline = true;
 			}
 			if(newline) {
@@ -325,24 +345,37 @@ public class CppClassGenerator extends ClassGenerator {
 			}
 
 			// Adding Default Constructor to Header
-			if(this.default_constructor_visibility == MethodVisibilityType.PUBLIC) {
-				this.sb_h.append(this.getNamespaceTabs() + "\t" + constructor.getSource(MethodType.DEFINITION));
+			if(!this.hasDefaultConstructor()) {
+				this.sb_h.append(this.getNamespaceTabs() + "\t\t" + constructor.getSource(MethodType.DEFINITION));
+				this.sb_h.append("\n");
 			}
-			// Get Non-Default Constructors
+			// Get Custom Constructors
 			for(CppMethodGenerator method : this.getMethodsOfVisibilityType(MethodVisibilityType.PUBLIC)) {
 				if(method.isConstructor()) {
-					this.sb_h.append(this.getNamespaceTabs() + "\t" + method.getSource(MethodType.DEFINITION));
+					this.sb_h.append(this.getNamespaceTabs() + "\t\t" + method.getSource(MethodType.DEFINITION));
+					this.sb_h.append("\n");
 				}
 			}
 			
 			// Adding Destructor to Header
-			this.sb_h.append(this.getNamespaceTabs() + "\t" + destructor.getSource(MethodType.DEFINITION));
+			if(!this.hasDestructor()) {
+				this.sb_h.append(this.getNamespaceTabs() + "\t\t" + destructor.getSource(MethodType.DEFINITION));
+				this.sb_h.append("\n");
+			} else {
+				for(CppMethodGenerator method : this.getMethodsOfVisibilityType(MethodVisibilityType.PUBLIC)) {
+					if(method.isDestructor()) {
+						this.sb_h.append(this.getNamespaceTabs() + "\t\t" + method.getSource(MethodType.DEFINITION));
+						this.sb_h.append("\n");
+					}
+				}
+			}
+			
 			this.sb_h.append("\n");
 			
 			// Get Remaining Methods
 			for(CppMethodGenerator method : this.getMethodsOfVisibilityType(MethodVisibilityType.PUBLIC)) {
-				if(!method.isConstructor()) {
-					this.sb_h.append(this.getNamespaceTabs() + "\t" + method.getSource(MethodType.DEFINITION));
+				if(!method.isConstructor() && !method.isDestructor()) {
+					this.sb_h.append(this.getNamespaceTabs() + "\t\t" + method.getSource(MethodType.DEFINITION));
 					newline = true;
 				}
 			}
@@ -367,6 +400,11 @@ public class CppClassGenerator extends ClassGenerator {
 		
 
 		
+		
+		
+		
+		
+		
 		//CPP File
 		//Include Header File
 		this.sb_i.append("#include \"" + this.include_prepend + "/" + this.name + ".h\"\n\n");
@@ -383,6 +421,9 @@ public class CppClassGenerator extends ClassGenerator {
 		for(String standard_library : this.standard_implementation_libraries) {
 			this.sb_i.append("#include <" + standard_library + ">\n");
 		}
+		if(this.standard_implementation_libraries.size() > 0) {
+			this.sb_i.append("\n");
+		}
 		for(String custom_library : this.custom_implementation_libraries) {
 			this.sb_i.append("#include \"" + custom_library + "\"\n");
 		}
@@ -390,7 +431,16 @@ public class CppClassGenerator extends ClassGenerator {
 			this.sb_i.append("\n");
 		}
 		
-		this.sb_i.append(constructor.getSource(MethodType.IMPLEMENTATION));
+		for(String implementation_typedef : this.implementation_typedefs) {
+			this.sb_i.append(implementation_typedef + "\n");
+		}
+		if(this.implementation_typedefs.size() > 0) {
+			this.sb_i.append("\n");
+		}
+		
+		if(!this.hasDefaultConstructor()) {
+			this.sb_i.append(constructor.getSource(MethodType.IMPLEMENTATION));
+		}
 		
 		for(CppMethodGenerator method : this.methods) {
 			if(method.isConstructor()) {
@@ -399,8 +449,10 @@ public class CppClassGenerator extends ClassGenerator {
 				this.sb_i.append(method.getSource(MethodType.IMPLEMENTATION));
 			}
 		}
-			
-		this.sb_i.append(destructor.getSource(MethodType.IMPLEMENTATION));
+		
+		if(!this.hasDestructor()) {
+			this.sb_i.append(destructor.getSource(MethodType.IMPLEMENTATION));
+		}
 		
 		for(CppMethodGenerator method : this.methods) {
 			if(!method.isConstructor()) {
@@ -419,9 +471,12 @@ public class CppClassGenerator extends ClassGenerator {
 		this.path = this.root_path + System.getProperty("file.separator") + ClassGenerator.getName(this.name,NamingSyntaxType.PASCAL, false) + ".cpp";
 		
 		if(super.save()) {
-			File file = new File(this.root_path + System.getProperty("file.separator") + "include");
-			if(!file.exists()) {
-				file.mkdir();
+			if(this.include_path == null || this.include_path.equals("")) {
+				this.include_path = this.root_path + System.getProperty("file.separator") + "include";
+				File file = new File(this.include_path);
+				if(!file.exists()) {
+					file.mkdir();
+				}
 			}
 			
 			this.sb.delete(0, this.sb.length());

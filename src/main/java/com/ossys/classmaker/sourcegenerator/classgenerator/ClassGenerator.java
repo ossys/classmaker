@@ -173,7 +173,7 @@ public class ClassGenerator implements ClassGeneratorInterface {
 	public static String getName(String name, ClassGenerator.NamingSyntaxType type, boolean plural) {
 		StringBuilder sb = new StringBuilder();
 		
-		if(name != null) {
+		if(name != null && name.length() > 0) {
 			String[] parts = name.split(" ");
 			int cnt = 0;
 			
