@@ -3,6 +3,7 @@ package com.ossys.classmaker.sourcegenerator.classgenerator;
 import java.io.File;
 import java.util.ArrayList;
 
+import com.ossys.classmaker.dbgenerator.attributegenerator.AttributeGenerator;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.AttributeGenerator.AttributeVisibilityType;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.AttributeType;
@@ -205,8 +206,8 @@ public class CppClassGenerator extends ClassGenerator {
 		destructor.setClassname(this.name);
 		
 		//Header File
-		this.sb_h.append("#ifndef _" + this.name.toUpperCase() + "_H_\n");
-		this.sb_h.append("#define _" + this.name.toUpperCase() + "_H_\n\n");
+		this.sb_h.append("#ifndef _" + AttributeGenerator.getAttributeName(this.name).toUpperCase() + "_H_\n");
+		this.sb_h.append("#define _" + AttributeGenerator.getAttributeName(this.name).toUpperCase() + "_H_\n\n");
 
 
 		for(String standard_library : this.standard_header_libraries) {
@@ -232,7 +233,7 @@ public class CppClassGenerator extends ClassGenerator {
 			this.sb_h.append("\n");
 		}
 		// Begin Class Definition
-		this.sb_h.append(this.getNamespaceTabs() + "class " + this.name);
+		this.sb_h.append(this.getNamespaceTabs() + "class " + ClassGenerator.getClassName(this.name));
 		if(this.extended_classes.size() > 0) {
 			this.sb_h.append(" : ");
 			int cnt=0;
@@ -330,7 +331,8 @@ public class CppClassGenerator extends ClassGenerator {
 		
 		// Adding public attributes and methods
 		if( this.hasMethodsOfVisibilityType(MethodVisibilityType.PUBLIC) ||
-			this.hasMembersOfVisibilityType(AttributeVisibilityType.PUBLIC)) {
+			this.hasMembersOfVisibilityType(AttributeVisibilityType.PUBLIC) ||
+			(!this.hasDefaultConstructor() && !this.hasDestructor())) {
 			
 			this.sb_h.append(this.getNamespaceTabs() + "\tpublic:\n");
 			
@@ -396,7 +398,7 @@ public class CppClassGenerator extends ClassGenerator {
 			this.sb_h.append("}\n");
 		}
 		
-		this.sb_h.append("#endif /* _" + this.name.toUpperCase() + "_H_ */\n");
+		this.sb_h.append("#endif /* _" + AttributeGenerator.getAttributeName(this.name).toUpperCase() + "_H_ */\n");
 		
 
 		
@@ -407,7 +409,7 @@ public class CppClassGenerator extends ClassGenerator {
 		
 		//CPP File
 		//Include Header File
-		this.sb_i.append("#include \"" + this.include_prepend + "/" + this.name + ".h\"\n\n");
+		this.sb_i.append("#include \"" + this.include_prepend + "/" + ClassGenerator.getClassName(this.name) + ".h\"\n\n");
 
 		for(CppAttributeGenerator attribute : CppAttributeGenerator.getGlobals()) {
 			attribute.setNamespace(this.getNamespace());
