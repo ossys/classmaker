@@ -188,7 +188,7 @@ public class CppAttributeGenerator extends AttributeGenerator {
 					this.sb.append(" ");
 					break;
 				case STRING:
-					this.sb.append("string");
+					this.sb.append("std::string");
 					if(this.is_array) {
 						this.sb.append("[]");
 					}
