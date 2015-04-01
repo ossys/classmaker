@@ -32,7 +32,26 @@ public class CppMethodGenerator extends MethodGenerator {
 		IMPLEMENTATION
 	}
 	
+	public static class InitParam {
+		private String name = "";
+		private String param = "";
+		
+		public InitParam(String name, String param) {
+			this.name = name;
+			this.param = param;
+		}
+		
+		public String getName() {
+			return this.name;
+		}
+		
+		public String getParam() {
+			return this.param;
+		}
+	}
+	
 	private ArrayList<CppAttributeGenerator> arguments = new ArrayList<CppAttributeGenerator>();
+	private ArrayList<InitParam> init_params = new ArrayList<InitParam>();
 
 	private boolean destructor = false;
 	private boolean virtual = false;
@@ -89,6 +108,12 @@ public class CppMethodGenerator extends MethodGenerator {
 
 	public void addArgument(CppAttributeGenerator argument) {
 		this.arguments.add(argument);
+	}
+	
+	public void addInitParam(InitParam init_param) {
+		if(this.constructor) {
+			this.init_params.add(init_param);
+		}
 	}
 	
 	public List<CppAttributeGenerator> getArguments() {
@@ -267,6 +292,21 @@ public class CppMethodGenerator extends MethodGenerator {
 				cnt++;
 			}
 			this.sb.append(")");
+			
+			// Constructor Initialization List
+			if(this.constructor) {
+				if(this.init_params.size() > 0) {
+					this.sb.append(" : ");
+				}
+				cnt = 0;
+				for(InitParam ip : this.init_params) {
+					if(cnt > 0) {
+						this.sb.append(", ");
+					}
+					this.sb.append(ip.getName() + "(" + ip.getParam() + ")");
+					cnt++;
+				}
+			}
 			
 			if(this.constant) {
 				this.sb.append(" const");
