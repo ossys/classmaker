@@ -211,10 +211,18 @@ public class CppClassGenerator extends ClassGenerator {
 
 
 		for(String standard_library : this.standard_header_libraries) {
-			this.sb_h.append("#include <" + standard_library + ">\n");
+			if(standard_library == null) {
+				this.sb_h.append("\n");
+			} else {
+				this.sb_h.append("#include <" + standard_library + ">\n");
+			}
 		}
 		for(String custom_library : this.custom_header_libraries) {
-			this.sb_h.append("#include \"" + custom_library + "\"\n");
+			if(custom_library == null) {
+				this.sb_h.append("\n");
+			} else {
+				this.sb_h.append("#include \"" + custom_library + "\"\n");
+			}
 		}
 		if(this.standard_header_libraries.size() > 0 || this.custom_header_libraries.size() > 0) {
 			this.sb_h.append("\n");
@@ -422,13 +430,21 @@ public class CppClassGenerator extends ClassGenerator {
 		}
 
 		for(String standard_library : this.standard_implementation_libraries) {
-			this.sb_i.append("#include <" + standard_library + ">\n");
+			if(standard_library == null) {
+				this.sb_i.append("\n");
+			} else {
+				this.sb_i.append("#include <" + standard_library + ">\n");
+			}
 		}
 		if(this.standard_implementation_libraries.size() > 0) {
 			this.sb_i.append("\n");
 		}
 		for(String custom_library : this.custom_implementation_libraries) {
-			this.sb_i.append("#include \"" + custom_library + "\"\n");
+			if(custom_library == null) {
+				this.sb_i.append("\n");
+			} else {
+				this.sb_i.append("#include \"" + custom_library + "\"\n");
+			}
 		}
 		if(this.custom_implementation_libraries.size() > 0) {
 			this.sb_i.append("\n");

@@ -24,7 +24,8 @@ public class CppAttributeGenerator extends AttributeGenerator {
 		DEFINITION,
 		CLASS,
 		ARGUMENT,
-		GLOBAL
+		GLOBAL,
+		TYPEDEF
 	}
 	
 	public static enum AttributeSignage {
@@ -42,6 +43,7 @@ public class CppAttributeGenerator extends AttributeGenerator {
 	private boolean instantiate_complex_type = false;
 	private boolean pass_by_reference = false;
 	private boolean pass_by_pointer = false;
+	private boolean typedef = false;
 	
 	public CppAttributeGenerator(String name, ClassGenerator.NamingSyntaxType namingSyntaxType) {
 		super(name, namingSyntaxType);
@@ -70,6 +72,10 @@ public class CppAttributeGenerator extends AttributeGenerator {
 	
 	public void setPassByPointer() {
 		this.pass_by_pointer = true;
+	}
+	
+	public void isTypedef() {
+		this.typedef = true;
 	}
 	
 	public void setGlobal() {
@@ -108,6 +114,8 @@ public class CppAttributeGenerator extends AttributeGenerator {
 				this.sb.append("final ");
 			} else if(this.cnst) {
 				this.sb.append("const ");
+			} else if(this.typedef) {
+				this.sb.append("typedef ");
 			}
 		} else if(type == AttributeType.ARGUMENT) {
 			if(this.cnst) {
