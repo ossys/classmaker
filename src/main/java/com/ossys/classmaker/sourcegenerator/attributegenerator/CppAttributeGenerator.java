@@ -1,6 +1,7 @@
 package com.ossys.classmaker.sourcegenerator.attributegenerator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator;
 
@@ -45,8 +46,12 @@ public class CppAttributeGenerator extends AttributeGenerator {
 	private boolean pass_by_pointer = false;
 	private boolean typedef = false;
 	
+	private List<String> generics = null;
+	
 	public CppAttributeGenerator(String name, ClassGenerator.NamingSyntaxType namingSyntaxType) {
 		super(name, namingSyntaxType);
+
+		this.generics = new ArrayList<String>();
 	}
 	
 	public void setType(PrimitiveType primitiveType) {
@@ -89,6 +94,10 @@ public class CppAttributeGenerator extends AttributeGenerator {
 	
 	public void setClassname(String classname) {
 		this.classname = classname;
+	}
+	
+	public void addGeneric(String generic) {
+		this.generics.add(generic);
 	}
 	
 	public static ArrayList<CppAttributeGenerator> getGlobals() {
@@ -220,9 +229,26 @@ public class CppAttributeGenerator extends AttributeGenerator {
 					break;
 			}
 		} else {
-			this.sb.append(this.complexType + " ");
+			this.sb.append(this.complexType);
+			// Add generics if required
+			if(this.generics.size() > 0) {
+				sb.append("<");
+			}
+			int cnt = 0;
+			for(String generic : this.generics) {
+				if(cnt>0) {
+					sb.append(", ");
+				}
+				sb.append(generic);
+				cnt++;
+			}
+			if(this.generics.size() > 0) {
+				sb.append(">");
+			}
+			this.sb.append(" ");
 		}
 
+		// Add fully-qualified class name
 		if(type == AttributeType.GLOBAL || type == AttributeType.CLASS) {
 			this.sb.append(this.namespace + ClassGenerator.getClassName(this.classname) + "::");
 		}
