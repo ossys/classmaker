@@ -78,6 +78,11 @@ public class CppAttributeGenerator extends AttributeGenerator {
 		this.typedef = true;
 	}
 	
+	@Override
+	public void setFinal() {
+		//In C++ Final is a C++11 extension for virtual methods only
+	}
+	
 	public void setGlobal() {
 		CppAttributeGenerator.globals.add(this);
 	}
@@ -103,18 +108,15 @@ public class CppAttributeGenerator extends AttributeGenerator {
 		this.sb = new StringBuilder();
 		
 		// Setting static, final or const keywords
-		if(type == AttributeType.DEFINITION) {
-			if(this.stc) {
+		if(type == AttributeType.DEFINITION ||
+			type == AttributeType.CLASS) {
+			if(this.stc && !(type == AttributeType.CLASS)) {
 				this.sb.append("static ");
-				
-				if(this.fin) {
-					this.sb.append("final ");
-				}
-			} else if(this.fin) {
-				this.sb.append("final ");
-			} else if(this.cnst) {
+			}
+			if(this.cnst) {
 				this.sb.append("const ");
-			} else if(this.typedef) {
+			}
+			if(this.typedef) {
 				this.sb.append("typedef ");
 			}
 		} else if(type == AttributeType.ARGUMENT) {
@@ -221,7 +223,7 @@ public class CppAttributeGenerator extends AttributeGenerator {
 			this.sb.append(this.complexType + " ");
 		}
 
-		if(type == AttributeType.GLOBAL) {
+		if(type == AttributeType.GLOBAL || type == AttributeType.CLASS) {
 			this.sb.append(this.namespace + ClassGenerator.getClassName(this.classname) + "::");
 		}
 		

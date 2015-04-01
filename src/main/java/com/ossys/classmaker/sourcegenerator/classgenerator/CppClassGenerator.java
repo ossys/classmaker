@@ -419,7 +419,7 @@ public class CppClassGenerator extends ClassGenerator {
 		//CPP File
 		//Include Header File
 		this.sb_i.append("#include \"" + this.include_prepend + "/" + ClassGenerator.getClassName(this.name) + ".h\"\n\n");
-
+		
 		for(CppAttributeGenerator attribute : CppAttributeGenerator.getGlobals()) {
 			attribute.setNamespace(this.getNamespace());
 			attribute.setClassname(this.name);
@@ -454,6 +454,17 @@ public class CppClassGenerator extends ClassGenerator {
 			this.sb_i.append(implementation_typedef + "\n");
 		}
 		if(this.implementation_typedefs.size() > 0) {
+			this.sb_i.append("\n");
+		}
+		
+		boolean newline = false;
+		for(CppAttributeGenerator a : this.attributes) {
+			if(a.isStatic() && a.isConstant() && a.hasDefault()) {
+				this.sb_i.append(a.getSource(AttributeType.CLASS));
+				newline = true;
+			}
+		}
+		if(newline) {
 			this.sb_i.append("\n");
 		}
 		

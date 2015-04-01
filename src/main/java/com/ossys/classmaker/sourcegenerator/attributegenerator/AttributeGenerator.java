@@ -108,6 +108,14 @@ public class AttributeGenerator implements AttributeGeneratorInterface {
 		this.dflt = dflt;
 	}
 	
+	public boolean hasDefault() {
+		if(this.dflt != null && !this.dflt.equals("")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public String getOriginalName() {
 		return this.name;
 	}
