@@ -8,6 +8,7 @@ import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGener
 import com.ossys.classmaker.sourcegenerator.attributegenerator.AttributeGenerator.AttributeVisibilityType;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.AttributeType;
 import com.ossys.classmaker.sourcegenerator.methodgenerator.CppMethodGenerator;
+import com.ossys.classmaker.sourcegenerator.methodgenerator.CppMethodGenerator.InitParam;
 import com.ossys.classmaker.sourcegenerator.methodgenerator.CppMethodGenerator.MethodType;
 import com.ossys.classmaker.sourcegenerator.methodgenerator.MethodGenerator.MethodVisibilityType;
 
@@ -206,8 +207,8 @@ public class CppClassGenerator extends ClassGenerator {
 		destructor.setClassname(this.name);
 		
 		//Header File
-		this.sb_h.append("#ifndef _" + AttributeGenerator.getAttributeName(this.name).toUpperCase() + "_H_\n");
-		this.sb_h.append("#define _" + AttributeGenerator.getAttributeName(this.name).toUpperCase() + "_H_\n\n");
+		this.sb_h.append("#ifndef _MODEL_" + AttributeGenerator.getAttributeName(this.name).toUpperCase() + "_H_\n");
+		this.sb_h.append("#define _MODEL_" + AttributeGenerator.getAttributeName(this.name).toUpperCase() + "_H_\n\n");
 
 
 		for(String standard_library : this.standard_header_libraries) {
@@ -387,6 +388,7 @@ public class CppClassGenerator extends ClassGenerator {
 			for(CppMethodGenerator method : this.getMethodsOfVisibilityType(MethodVisibilityType.PUBLIC)) {
 				if(!method.isConstructor() && !method.isDestructor()) {
 					this.sb_h.append(this.getNamespaceTabs() + "\t\t" + method.getSource(MethodType.DEFINITION));
+					this.sb_h.append("\n");
 					newline = true;
 				}
 			}
@@ -409,7 +411,6 @@ public class CppClassGenerator extends ClassGenerator {
 		
 		this.sb_h.append("#endif /* _" + AttributeGenerator.getAttributeName(this.name).toUpperCase() + "_H_ */\n");
 		
-
 		
 		
 		
@@ -451,7 +452,7 @@ public class CppClassGenerator extends ClassGenerator {
 		}
 		
 		for(String implementation_typedef : this.implementation_typedefs) {
-			this.sb_i.append(implementation_typedef + "\n");
+			this.sb_i.append("typedef " + implementation_typedef + ";\n");
 		}
 		if(this.implementation_typedefs.size() > 0) {
 			this.sb_i.append("\n");
@@ -469,11 +470,23 @@ public class CppClassGenerator extends ClassGenerator {
 		}
 		
 		if(!this.hasDefaultConstructor()) {
+			// Add non-const attributes with default values to the default param for default constructor
+			for(CppAttributeGenerator a : this.attributes) {
+				if(!a.isConstant() && a.hasDefault()) {
+					constructor.addInitParam(new CppMethodGenerator.InitParam(a.name(), a.getDefault()));
+				}
+			}
 			this.sb_i.append(constructor.getSource(MethodType.IMPLEMENTATION));
 		}
 		
 		for(CppMethodGenerator method : this.methods) {
 			if(method.isConstructor()) {
+				// Add non-const attributes with default values to the default param for all other constructors
+				for(CppAttributeGenerator a : this.attributes) {
+					if(!a.isConstant() && a.hasDefault()) {
+						method.addInitParam(new CppMethodGenerator.InitParam(a.name(), a.getDefault()));
+					}
+				}
 				method.setNamespace(this.getNamespace());
 				method.setClassname(this.name);
 				this.sb_i.append(method.getSource(MethodType.IMPLEMENTATION));

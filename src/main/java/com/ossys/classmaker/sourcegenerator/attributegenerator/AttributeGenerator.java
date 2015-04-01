@@ -108,6 +108,10 @@ public class AttributeGenerator implements AttributeGeneratorInterface {
 		this.dflt = dflt;
 	}
 	
+	public String getDefault() {
+		return this.dflt;
+	}
+	
 	public boolean hasDefault() {
 		if(this.dflt != null && !this.dflt.equals("")) {
 			return true;

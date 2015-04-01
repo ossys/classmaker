@@ -142,7 +142,7 @@ public class CppAttributeGenerator extends AttributeGenerator {
 		if(this.primitiveType != null) {
 			switch(this.primitiveType) {
 				case BOOLEAN:
-					this.sb.append("boolean");
+					this.sb.append("bool");
 					if(this.is_array) {
 						this.sb.append("[]");
 					}
@@ -236,13 +236,15 @@ public class CppAttributeGenerator extends AttributeGenerator {
 		this.sb.append(this.name());
 		
 		if(type == AttributeType.CLASS ||
-			type == AttributeType.GLOBAL) {
+			type == AttributeType.GLOBAL
+//			|| (type == AttributeType.DEFINITION && !this.cnst && this.primitiveType != null) // Un-comment this to initialize in-header
+			) {
 			if(this.is_array) {
 				if(this.array_size > 0 && this.primitiveType != null) {
 					this.sb.append(" = new ");
 					switch(this.primitiveType) {
 						case BOOLEAN:
-							this.sb.append("boolean");
+							this.sb.append("bool");
 							break;
 						case BYTE:
 							this.sb.append("byte");
@@ -296,7 +298,7 @@ public class CppAttributeGenerator extends AttributeGenerator {
 						if(!this.is_array) {
 							this.sb.append(" = 0x00B");
 						} else {
-							this.sb.append(" = null");
+							this.sb.append(" = NULL");
 						}
 						break;
 						
@@ -329,14 +331,14 @@ public class CppAttributeGenerator extends AttributeGenerator {
 						break;
 						
 					default:
-						this.sb.append(" = null");
+						this.sb.append(" = NULL");
 						break;
 				}
 			} else if(this.complexType != null) {
 				if(this.instantiate_complex_type) {
 					this.sb.append(" = new " + this.complexType + "()");
 				} else {
-					this.sb.append(" = null");
+					this.sb.append(" = NULL");
 				}
 			}
 		}
