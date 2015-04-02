@@ -2,6 +2,7 @@ package com.ossys.classmaker.sourcegenerator.classgenerator;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.ossys.classmaker.dbgenerator.attributegenerator.AttributeGenerator;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator;
@@ -26,15 +27,16 @@ public class CppClassGenerator extends ClassGenerator {
 	String include_path = "";
 	String include_prepend = "";
 	
-	private ArrayList<CppMethodGenerator> methods = new ArrayList<CppMethodGenerator>();
-	private ArrayList<CppAttributeGenerator> attributes = new ArrayList<CppAttributeGenerator>();
-	private ArrayList<String> standard_header_libraries = new ArrayList<String>();
-	private ArrayList<String> custom_header_libraries = new ArrayList<String>();
-	private ArrayList<String> standard_implementation_libraries = new ArrayList<String>();
-	private ArrayList<String> custom_implementation_libraries = new ArrayList<String>();
-	private ArrayList<String> header_typedefs = new ArrayList<String>();
-	private ArrayList<String> implementation_typedefs = new ArrayList<String>();
-	private ArrayList<String> namespaces = new ArrayList<String>();
+	private List<CppMethodGenerator> methods = new ArrayList<CppMethodGenerator>();
+	private List<CppAttributeGenerator> attributes = new ArrayList<CppAttributeGenerator>();
+	private List<String> standard_header_libraries = new ArrayList<String>();
+	private List<String> custom_header_libraries = new ArrayList<String>();
+	private List<String> standard_implementation_libraries = new ArrayList<String>();
+	private List<String> custom_implementation_libraries = new ArrayList<String>();
+	private List<String> header_typedefs = new ArrayList<String>();
+	private List<String> implementation_typedefs = new ArrayList<String>();
+	private List<String> namespaces = new ArrayList<String>();
+	private List<String> forward_declarations = new ArrayList<String>();
 	
 	public CppClassGenerator(String name, String path) {
 		super(name,path);
@@ -83,6 +85,10 @@ public class CppClassGenerator extends ClassGenerator {
 	
 	public void addImplementationTypedef(String typedef) {
 		this.implementation_typedefs.add(typedef);
+	}
+	
+	public void addForwardDeclaration(String forward_declaration) {
+		this.forward_declarations.add(forward_declaration);
 	}
 	
 	public String getNamespace() {
@@ -226,6 +232,13 @@ public class CppClassGenerator extends ClassGenerator {
 			}
 		}
 		if(this.standard_header_libraries.size() > 0 || this.custom_header_libraries.size() > 0) {
+			this.sb_h.append("\n");
+		}
+		
+		for(String forward_declaration : this.forward_declarations) {
+			this.sb_h.append(forward_declaration + "\n");
+		}
+		if(this.forward_declarations.size() > 0) {
 			this.sb_h.append("\n");
 		}
 		

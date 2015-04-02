@@ -152,6 +152,9 @@ public class CppMethodGenerator extends MethodGenerator {
 	private void generate(MethodType type) {
 		this.sb.delete(0, this.sb.length());
 		if(type == MethodType.DEFINITION) {
+			if(!this.constructor && !this.destructor && this.stc) {
+				this.sb.append("static ");
+			}
 			if((!this.constructor && !this.destructor) &&
 				this.return_type == null &&
 				(this.complex_type == null ||
