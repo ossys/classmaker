@@ -8,6 +8,7 @@ import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGener
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.AttributeType;
 import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator;
 import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator.NamingSyntaxType;
+import com.ossys.classmaker.sourcegenerator.methodgenerator.JavaMethodGenerator.ReturnType;
 
 public class CppMethodGenerator extends MethodGenerator {
 	
@@ -23,6 +24,7 @@ public class CppMethodGenerator extends MethodGenerator {
 		STRING
 	}
 	private ReturnType return_type = null;
+	
 	private AttributeSignage return_signage = null;
 	
 	private String complex_type = null;
@@ -71,6 +73,16 @@ public class CppMethodGenerator extends MethodGenerator {
 		super(name,type);
 	}
 	
+	public void setReturnType(ReturnType returnType) {
+		this.return_type = returnType;
+		this.complex_type = null;
+	}
+	
+	public void setReturnType(String complexType) {
+		this.complex_type = complexType;
+		this.return_type = null;
+	}
+	
 	public void setDestructor() {
 		this.destructor = true;
 	}
@@ -85,11 +97,6 @@ public class CppMethodGenerator extends MethodGenerator {
 	
 	public void setReturnSignage(AttributeSignage return_signage) {
 		this.return_signage = return_signage;
-		this.complex_type = null;
-	}
-	
-	public void setReturnType(ReturnType return_type) {
-		this.return_type = return_type;
 		this.complex_type = null;
 	}
 	
@@ -147,7 +154,8 @@ public class CppMethodGenerator extends MethodGenerator {
 		if(type == MethodType.DEFINITION) {
 			if((!this.constructor && !this.destructor) &&
 				this.return_type == null &&
-				this.complex_type == null) {
+				(this.complex_type == null ||
+				this.complex_type == "")) {
 				this.sb.append("void ");
 			} else if(this.return_type != null && !this.constructor) {
 				if(this.return_signage != null) {
@@ -189,7 +197,7 @@ public class CppMethodGenerator extends MethodGenerator {
 						sb.append("char ");
 						break;
 					case STRING:
-						sb.append("string ");
+						sb.append("std::string ");
 						break;
 				}
 			} else if(this.complex_type != null && !this.constructor) {
@@ -273,7 +281,7 @@ public class CppMethodGenerator extends MethodGenerator {
 							sb.append("char ");
 							break;
 						case STRING:
-							sb.append("string ");
+							sb.append("std::string ");
 							break;
 					}
 				} else if(this.complex_type != null && !this.constructor) {
