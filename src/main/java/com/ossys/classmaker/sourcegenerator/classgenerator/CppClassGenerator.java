@@ -6,8 +6,10 @@ import java.util.List;
 
 import com.ossys.classmaker.dbgenerator.attributegenerator.AttributeGenerator;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator;
+import com.ossys.classmaker.sourcegenerator.attributegenerator.JavaAttributeGenerator;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.AttributeGenerator.AttributeVisibilityType;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.AttributeType;
+import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator.NamingSyntaxType;
 import com.ossys.classmaker.sourcegenerator.methodgenerator.CppMethodGenerator;
 import com.ossys.classmaker.sourcegenerator.methodgenerator.CppMethodGenerator.InitParam;
 import com.ossys.classmaker.sourcegenerator.methodgenerator.CppMethodGenerator.MethodType;
@@ -37,6 +39,7 @@ public class CppClassGenerator extends ClassGenerator {
 	private List<String> implementation_typedefs = new ArrayList<String>();
 	private List<String> namespaces = new ArrayList<String>();
 	private List<String> forward_declarations = new ArrayList<String>();
+	private List<Enum> enums = new ArrayList<Enum>();
 	
 	public CppClassGenerator(String name, String path) {
 		super(name,path);
@@ -89,6 +92,10 @@ public class CppClassGenerator extends ClassGenerator {
 	
 	public void addForwardDeclaration(String forward_declaration) {
 		this.forward_declarations.add(forward_declaration);
+	}
+	
+	public void addEnumClass(CppAttributeGenerator cppag, List<String> types) {
+		this.enums.add(new Enum(cppag, types));
 	}
 	
 	public String getNamespace() {
@@ -240,6 +247,11 @@ public class CppClassGenerator extends ClassGenerator {
 		}
 		if(this.forward_declarations.size() > 0) {
 			this.sb_h.append("\n");
+		}
+		
+		// Enum definitions
+		for(Enum e : this.enums) {
+			this.sb_h.append(e.toString());
 		}
 		
 		// Defining Namespaces
@@ -550,5 +562,48 @@ public class CppClassGenerator extends ClassGenerator {
 		
 		return true;
 	}
+	
+	
+	
+	
+	
+	
+
+	
+	private class Enum {
+		private CppAttributeGenerator cppag = null;
+		private List<String> types = new ArrayList<String>();
+		
+		public Enum(CppAttributeGenerator cppag, List<String> types) {
+			this.cppag = cppag;
+			this.types = types;
+		}
+		
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			
+			sb.append("namespace " + ClassGenerator.getClassName(cppag.getOriginalName()) + " {\n");
+			sb.append("\tenum Enum {");
+			int cnt = 0;
+			for(String type : this.types) {
+				if(cnt > 0) {
+					sb.append(",");
+				}
+				sb.append(ClassGenerator.getName("\n\t\t" + type, ClassGenerator.NamingSyntaxType.UPPERCASE, false));
+				cnt++;
+			}
+			sb.append("\n\t};\n");
+			sb.append("}\n\n");
+			
+			return sb.toString();
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
 	
 }
