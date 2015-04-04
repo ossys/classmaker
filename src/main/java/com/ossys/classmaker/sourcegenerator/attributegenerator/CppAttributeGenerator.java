@@ -108,6 +108,10 @@ public class CppAttributeGenerator extends AttributeGenerator {
 		this.instantiate_complex_type = true;
 	}
 	
+	public PrimitiveType getPrimitiveType() {
+		return this.primitiveType;
+	}
+	
 	public String getSource(AttributeType type) {
 		this.generate(type);
 		return this.sb.toString();

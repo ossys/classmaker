@@ -498,7 +498,7 @@ public class CppClassGenerator extends ClassGenerator {
 			// Add non-const attributes with default values to the default param for default constructor
 			for(CppAttributeGenerator a : this.attributes) {
 				if(!a.isConstant() && a.hasDefault()) {
-					constructor.addInitParam(new CppMethodGenerator.InitParam(a.name(), a.getDefault()));
+					constructor.addInitParam(new CppMethodGenerator.InitParam(a.name(), a.getDefault(), a));
 				}
 			}
 			this.sb_i.append(constructor.getSource(MethodType.IMPLEMENTATION));
@@ -509,7 +509,7 @@ public class CppClassGenerator extends ClassGenerator {
 				// Add non-const attributes with default values to the default param for all other constructors
 				for(CppAttributeGenerator a : this.attributes) {
 					if(!a.isConstant() && a.hasDefault()) {
-						method.addInitParam(new CppMethodGenerator.InitParam(a.name(), a.getDefault()));
+						method.addInitParam(new CppMethodGenerator.InitParam(a.name(), a.getDefault(), a));
 					}
 				}
 				method.setNamespace(this.getNamespace());
@@ -577,6 +577,10 @@ public class CppClassGenerator extends ClassGenerator {
 		public Enum(CppAttributeGenerator cppag, List<String> types) {
 			this.cppag = cppag;
 			this.types = types;
+		}
+		
+		public CppAttributeGenerator getAttribute() {
+			return this.cppag;
 		}
 		
 		public String toString() {

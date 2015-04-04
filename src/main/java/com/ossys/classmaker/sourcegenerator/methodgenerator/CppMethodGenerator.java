@@ -6,6 +6,7 @@ import java.util.List;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.AttributeSignage;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.AttributeType;
+import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.PrimitiveType;
 import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator;
 import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator.NamingSyntaxType;
 import com.ossys.classmaker.sourcegenerator.methodgenerator.JavaMethodGenerator.ReturnType;
@@ -37,10 +38,12 @@ public class CppMethodGenerator extends MethodGenerator {
 	public static class InitParam {
 		private String name = "";
 		private String param = "";
+		private CppAttributeGenerator cppag = null;
 		
-		public InitParam(String name, String param) {
+		public InitParam(String name, String param, CppAttributeGenerator cppag) {
 			this.name = name;
 			this.param = param;
+			this.cppag = cppag;
 		}
 		
 		public String getName() {
@@ -49,6 +52,10 @@ public class CppMethodGenerator extends MethodGenerator {
 		
 		public String getParam() {
 			return this.param;
+		}
+		
+		public CppAttributeGenerator getAttribute() {
+			return this.cppag;
 		}
 	}
 	
@@ -314,7 +321,15 @@ public class CppMethodGenerator extends MethodGenerator {
 					if(cnt > 0) {
 						this.sb.append(", ");
 					}
-					this.sb.append(ip.getName() + "(" + ip.getParam() + ")");
+					if(ip.getAttribute() != null) {
+						if(ip.getAttribute().getPrimitiveType() == PrimitiveType.STRING) {
+							this.sb.append(ip.getAttribute().name() + "(\"" + ip.getAttribute().getDefault() + "\")");
+						} else {
+							this.sb.append(ip.getAttribute().name() + "(" + ip.getAttribute().getDefault() + ")");
+						}
+					} else {
+						this.sb.append(ip.getName() + "(" + ip.getParam() + ")");
+					}
 					cnt++;
 				}
 			}

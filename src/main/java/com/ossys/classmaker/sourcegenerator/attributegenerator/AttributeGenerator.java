@@ -113,7 +113,7 @@ public class AttributeGenerator implements AttributeGeneratorInterface {
 	}
 	
 	public boolean hasDefault() {
-		if(this.dflt != null && !this.dflt.equals("")) {
+		if(this.dflt != null) {
 			return true;
 		} else {
 			return false;
