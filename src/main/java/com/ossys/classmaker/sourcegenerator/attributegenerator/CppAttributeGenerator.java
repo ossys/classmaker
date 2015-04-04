@@ -112,6 +112,10 @@ public class CppAttributeGenerator extends AttributeGenerator {
 		return this.primitiveType;
 	}
 	
+	public String getComplexType() {
+		return this.complexType;
+	}
+	
 	public String getSource(AttributeType type) {
 		this.generate(type);
 		return this.sb.toString();
@@ -225,7 +229,7 @@ public class CppAttributeGenerator extends AttributeGenerator {
 					this.sb.append(" ");
 					break;
 				case DATE:
-					this.sb.append("Calendar");
+					this.sb.append("std::time_t");
 					if(this.is_array) {
 						this.sb.append("[]");
 					}

@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.ossys.classmaker.dbgenerator.attributegenerator.AttributeGenerator;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator;
+import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.PrimitiveType;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.JavaAttributeGenerator;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.AttributeGenerator.AttributeVisibilityType;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.AttributeType;
@@ -147,6 +148,24 @@ public class CppClassGenerator extends ClassGenerator {
 		return false;
 	}
 	
+	public boolean hasAttributeOfType(PrimitiveType type) {
+		for(CppAttributeGenerator a : this.attributes) {
+			if(a.getPrimitiveType() == type) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean hasAttributeOfType(String type) {
+		for(CppAttributeGenerator a : this.attributes) {
+			if(a.getComplexType().equals(type)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public ArrayList<CppMethodGenerator> getMethodsOfVisibilityType(MethodVisibilityType type) {
 		ArrayList<CppMethodGenerator> methods = new ArrayList<CppMethodGenerator>();
 		for(CppMethodGenerator method : this.methods) {
@@ -230,6 +249,9 @@ public class CppClassGenerator extends ClassGenerator {
 			} else {
 				this.sb_h.append("#include <" + standard_library + ">\n");
 			}
+		}
+		if(this.hasAttributeOfType(PrimitiveType.DATE)) {
+			this.sb_h.append("#include <ctime>\n");
 		}
 		for(String custom_library : this.custom_header_libraries) {
 			if(custom_library == null) {
