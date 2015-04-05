@@ -250,9 +250,6 @@ public class CppClassGenerator extends ClassGenerator {
 				this.sb_h.append("#include <" + standard_library + ">\n");
 			}
 		}
-		if(this.hasAttributeOfType(PrimitiveType.DATE)) {
-			this.sb_h.append("#include <ctime>\n");
-		}
 		for(String custom_library : this.custom_header_libraries) {
 			if(custom_library == null) {
 				this.sb_h.append("\n");
