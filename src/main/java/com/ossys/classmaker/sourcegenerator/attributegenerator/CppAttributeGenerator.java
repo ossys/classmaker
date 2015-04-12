@@ -187,7 +187,7 @@ public class CppAttributeGenerator extends AttributeGenerator {
 					this.sb.append(" ");
 					break;
 				case LONG:
-					this.sb.append("long");
+					this.sb.append("long long");
 					if(this.is_array) {
 						this.sb.append("[]");
 					}
@@ -300,7 +300,7 @@ public class CppAttributeGenerator extends AttributeGenerator {
 							this.sb.append("int");
 							break;
 						case LONG:
-							this.sb.append("long");
+							this.sb.append("long long");
 							break;
 						case SHORT:
 							this.sb.append("short");
