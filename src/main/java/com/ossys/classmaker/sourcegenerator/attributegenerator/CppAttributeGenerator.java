@@ -45,6 +45,7 @@ public class CppAttributeGenerator extends AttributeGenerator {
 	private boolean pass_by_reference = false;
 	private boolean pass_by_pointer = false;
 	private boolean typedef = false;
+	private boolean pointer = false;
 	
 	private List<String> generics = null;
 	
@@ -81,6 +82,10 @@ public class CppAttributeGenerator extends AttributeGenerator {
 	
 	public void isTypedef() {
 		this.typedef = true;
+	}
+	
+	public void isPointer() {
+		this.pointer = true;
 	}
 	
 	@Override

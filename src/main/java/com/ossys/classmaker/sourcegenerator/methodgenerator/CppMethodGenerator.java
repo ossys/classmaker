@@ -324,6 +324,8 @@ public class CppMethodGenerator extends MethodGenerator {
 					if(ip.getAttribute() != null) {
 						if(ip.getAttribute().getPrimitiveType() == PrimitiveType.STRING) {
 							this.sb.append(ip.getAttribute().name() + "(\"" + ip.getAttribute().getDefault() + "\")");
+						} if(ip.getAttribute().getPrimitiveType() == PrimitiveType.LONG) {
+							this.sb.append(ip.getAttribute().name() + "(" + ip.getAttribute().getDefault() + "L)");
 						} else {
 							this.sb.append(ip.getAttribute().name() + "(" + ip.getAttribute().getDefault() + ")");
 						}
