@@ -1,12 +1,15 @@
 package com.ossys.classmaker.sourcegenerator.methodgenerator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.AttributeSignage;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.AttributeType;
+import com.ossys.classmaker.sourcegenerator.attributegenerator.CppAttributeGenerator.PrimitiveType;
 import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator;
 import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator.NamingSyntaxType;
+import com.ossys.classmaker.sourcegenerator.methodgenerator.JavaMethodGenerator.ReturnType;
 
 public class CppMethodGenerator extends MethodGenerator {
 	
@@ -22,6 +25,7 @@ public class CppMethodGenerator extends MethodGenerator {
 		STRING
 	}
 	private ReturnType return_type = null;
+	
 	private AttributeSignage return_signage = null;
 	
 	private String complex_type = null;
@@ -31,7 +35,32 @@ public class CppMethodGenerator extends MethodGenerator {
 		IMPLEMENTATION
 	}
 	
+	public static class InitParam {
+		private String name = "";
+		private String param = "";
+		private CppAttributeGenerator cppag = null;
+		
+		public InitParam(String name, String param, CppAttributeGenerator cppag) {
+			this.name = name;
+			this.param = param;
+			this.cppag = cppag;
+		}
+		
+		public String getName() {
+			return this.name;
+		}
+		
+		public String getParam() {
+			return this.param;
+		}
+		
+		public CppAttributeGenerator getAttribute() {
+			return this.cppag;
+		}
+	}
+	
 	private ArrayList<CppAttributeGenerator> arguments = new ArrayList<CppAttributeGenerator>();
+	private ArrayList<InitParam> init_params = new ArrayList<InitParam>();
 
 	private boolean destructor = false;
 	private boolean virtual = false;
@@ -51,6 +80,16 @@ public class CppMethodGenerator extends MethodGenerator {
 		super(name,type);
 	}
 	
+	public void setReturnType(ReturnType returnType) {
+		this.return_type = returnType;
+		this.complex_type = null;
+	}
+	
+	public void setReturnType(String complexType) {
+		this.complex_type = complexType;
+		this.return_type = null;
+	}
+	
 	public void setDestructor() {
 		this.destructor = true;
 	}
@@ -65,11 +104,6 @@ public class CppMethodGenerator extends MethodGenerator {
 	
 	public void setReturnSignage(AttributeSignage return_signage) {
 		this.return_signage = return_signage;
-		this.complex_type = null;
-	}
-	
-	public void setReturnType(ReturnType return_type) {
-		this.return_type = return_type;
 		this.complex_type = null;
 	}
 	
@@ -90,6 +124,33 @@ public class CppMethodGenerator extends MethodGenerator {
 		this.arguments.add(argument);
 	}
 	
+	public void addInitParam(InitParam init_param) {
+		if(this.constructor) {
+			this.init_params.add(init_param);
+		}
+	}
+	
+	public List<CppAttributeGenerator> getArguments() {
+		return this.arguments;
+	}
+	
+	public boolean isDestructor() {
+		return this.destructor;
+	}
+	
+	public boolean isConstructor() {
+		this.classname = this.name;
+		return this.constructor;
+	}
+	
+	public boolean isDefaultConstructor() {
+		if(this.constructor && this.arguments.size() == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public String getSource(MethodType type) {
 		this.generate(type);
 		return this.sb.toString();
@@ -98,9 +159,13 @@ public class CppMethodGenerator extends MethodGenerator {
 	private void generate(MethodType type) {
 		this.sb.delete(0, this.sb.length());
 		if(type == MethodType.DEFINITION) {
+			if(!this.constructor && !this.destructor && this.stc) {
+				this.sb.append("static ");
+			}
 			if((!this.constructor && !this.destructor) &&
 				this.return_type == null &&
-				this.complex_type == null) {
+				(this.complex_type == null ||
+				this.complex_type == "")) {
 				this.sb.append("void ");
 			} else if(this.return_type != null && !this.constructor) {
 				if(this.return_signage != null) {
@@ -142,7 +207,7 @@ public class CppMethodGenerator extends MethodGenerator {
 						sb.append("char ");
 						break;
 					case STRING:
-						sb.append("string ");
+						sb.append("std::string ");
 						break;
 				}
 			} else if(this.complex_type != null && !this.constructor) {
@@ -156,7 +221,7 @@ public class CppMethodGenerator extends MethodGenerator {
 				this.sb.append("~");
 			}
 			if(this.constructor || this.destructor) {
-				this.sb.append(ClassGenerator.getClassName(this.name));
+				this.sb.append(ClassGenerator.getClassName(this.classname));
 			} else {
 				this.sb.append(this.name());
 			}
@@ -175,7 +240,7 @@ public class CppMethodGenerator extends MethodGenerator {
 			if(this.constant) {
 				this.sb.append(" const");
 			}
-			this.sb.append(";\n");
+			this.sb.append(";");
 		} else if(type == MethodType.IMPLEMENTATION) {
 			if(this.constructor) {
 				this.sb.append(this.namespace + ClassGenerator.getName(this.classname, NamingSyntaxType.PASCAL, false) + "::" + ClassGenerator.getClassName(this.name));
@@ -226,7 +291,7 @@ public class CppMethodGenerator extends MethodGenerator {
 							sb.append("char ");
 							break;
 						case STRING:
-							sb.append("string ");
+							sb.append("std::string ");
 							break;
 					}
 				} else if(this.complex_type != null && !this.constructor) {
@@ -246,13 +311,38 @@ public class CppMethodGenerator extends MethodGenerator {
 			}
 			this.sb.append(")");
 			
+			// Constructor Initialization List
+			if(this.constructor) {
+				if(this.init_params.size() > 0) {
+					this.sb.append(" : ");
+				}
+				cnt = 0;
+				for(InitParam ip : this.init_params) {
+					if(cnt > 0) {
+						this.sb.append(", ");
+					}
+					if(ip.getAttribute() != null) {
+						if(ip.getAttribute().getPrimitiveType() == PrimitiveType.STRING) {
+							this.sb.append(ip.getAttribute().name() + "(\"" + ip.getAttribute().getDefault() + "\")");
+						} if(ip.getAttribute().getPrimitiveType() == PrimitiveType.LONG) {
+							this.sb.append(ip.getAttribute().name() + "(" + ip.getAttribute().getDefault() + "L)");
+						} else {
+							this.sb.append(ip.getAttribute().name() + "(" + ip.getAttribute().getDefault() + ")");
+						}
+					} else {
+						this.sb.append(ip.getName() + "(" + ip.getParam() + ")");
+					}
+					cnt++;
+				}
+			}
+			
 			if(this.constant) {
 				this.sb.append(" const");
 			}
 			
 			this.sb.append(" {\n");
 			this.sb.append(this.code);
-			this.sb.append("}\n\n");
+			this.sb.append("\n}\n\n");
 		}
 	}
 	

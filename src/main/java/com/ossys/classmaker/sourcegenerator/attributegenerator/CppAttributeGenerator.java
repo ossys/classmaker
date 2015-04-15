@@ -1,6 +1,7 @@
 package com.ossys.classmaker.sourcegenerator.attributegenerator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator;
 
@@ -24,7 +25,8 @@ public class CppAttributeGenerator extends AttributeGenerator {
 		DEFINITION,
 		CLASS,
 		ARGUMENT,
-		GLOBAL
+		GLOBAL,
+		TYPEDEF
 	}
 	
 	public static enum AttributeSignage {
@@ -42,9 +44,15 @@ public class CppAttributeGenerator extends AttributeGenerator {
 	private boolean instantiate_complex_type = false;
 	private boolean pass_by_reference = false;
 	private boolean pass_by_pointer = false;
+	private boolean typedef = false;
+	private boolean pointer = false;
+	
+	private List<String> generics = null;
 	
 	public CppAttributeGenerator(String name, ClassGenerator.NamingSyntaxType namingSyntaxType) {
 		super(name, namingSyntaxType);
+
+		this.generics = new ArrayList<String>();
 	}
 	
 	public void setType(PrimitiveType primitiveType) {
@@ -72,6 +80,19 @@ public class CppAttributeGenerator extends AttributeGenerator {
 		this.pass_by_pointer = true;
 	}
 	
+	public void isTypedef() {
+		this.typedef = true;
+	}
+	
+	public void isPointer() {
+		this.pointer = true;
+	}
+	
+	@Override
+	public void setFinal() {
+		//In C++ Final is a C++11 extension for virtual methods only
+	}
+	
 	public void setGlobal() {
 		CppAttributeGenerator.globals.add(this);
 	}
@@ -80,12 +101,24 @@ public class CppAttributeGenerator extends AttributeGenerator {
 		this.classname = classname;
 	}
 	
+	public void addGeneric(String generic) {
+		this.generics.add(generic);
+	}
+	
 	public static ArrayList<CppAttributeGenerator> getGlobals() {
 		return CppAttributeGenerator.globals;
 	}
 	
 	public void instantiateComplexType() {
 		this.instantiate_complex_type = true;
+	}
+	
+	public PrimitiveType getPrimitiveType() {
+		return this.primitiveType;
+	}
+	
+	public String getComplexType() {
+		return this.complexType;
 	}
 	
 	public String getSource(AttributeType type) {
@@ -97,17 +130,16 @@ public class CppAttributeGenerator extends AttributeGenerator {
 		this.sb = new StringBuilder();
 		
 		// Setting static, final or const keywords
-		if(type == AttributeType.DEFINITION) {
-			if(this.stc) {
+		if(type == AttributeType.DEFINITION ||
+			type == AttributeType.CLASS) {
+			if(this.stc && !(type == AttributeType.CLASS)) {
 				this.sb.append("static ");
-				
-				if(this.fin) {
-					this.sb.append("final ");
-				}
-			} else if(this.fin) {
-				this.sb.append("final ");
-			} else if(this.cnst) {
+			}
+			if(this.cnst) {
 				this.sb.append("const ");
+			}
+			if(this.typedef) {
+				this.sb.append("typedef ");
 			}
 		} else if(type == AttributeType.ARGUMENT) {
 			if(this.cnst) {
@@ -132,7 +164,7 @@ public class CppAttributeGenerator extends AttributeGenerator {
 		if(this.primitiveType != null) {
 			switch(this.primitiveType) {
 				case BOOLEAN:
-					this.sb.append("boolean");
+					this.sb.append("bool");
 					if(this.is_array) {
 						this.sb.append("[]");
 					}
@@ -160,7 +192,7 @@ public class CppAttributeGenerator extends AttributeGenerator {
 					this.sb.append(" ");
 					break;
 				case LONG:
-					this.sb.append("long");
+					this.sb.append("long long");
 					if(this.is_array) {
 						this.sb.append("[]");
 					}
@@ -188,7 +220,7 @@ public class CppAttributeGenerator extends AttributeGenerator {
 					this.sb.append(" ");
 					break;
 				case STRING:
-					this.sb.append("string");
+					this.sb.append("std::string");
 					if(this.is_array) {
 						this.sb.append("[]");
 					}
@@ -202,7 +234,7 @@ public class CppAttributeGenerator extends AttributeGenerator {
 					this.sb.append(" ");
 					break;
 				case DATE:
-					this.sb.append("Calendar");
+					this.sb.append("std::time_t");
 					if(this.is_array) {
 						this.sb.append("[]");
 					}
@@ -210,10 +242,27 @@ public class CppAttributeGenerator extends AttributeGenerator {
 					break;
 			}
 		} else {
-			this.sb.append(this.complexType + " ");
+			this.sb.append(this.complexType);
+			// Add generics if required
+			if(this.generics.size() > 0) {
+				sb.append("<");
+			}
+			int cnt = 0;
+			for(String generic : this.generics) {
+				if(cnt>0) {
+					sb.append(", ");
+				}
+				sb.append(generic);
+				cnt++;
+			}
+			if(this.generics.size() > 0) {
+				sb.append(">");
+			}
+			this.sb.append(" ");
 		}
 
-		if(type == AttributeType.GLOBAL) {
+		// Add fully-qualified class name
+		if(type == AttributeType.GLOBAL || type == AttributeType.CLASS) {
 			this.sb.append(this.namespace + ClassGenerator.getClassName(this.classname) + "::");
 		}
 		
@@ -226,13 +275,15 @@ public class CppAttributeGenerator extends AttributeGenerator {
 		this.sb.append(this.name());
 		
 		if(type == AttributeType.CLASS ||
-			type == AttributeType.GLOBAL) {
+			type == AttributeType.GLOBAL
+//			|| (type == AttributeType.DEFINITION && !this.cnst && this.primitiveType != null) // Un-comment this to initialize in-header
+			) {
 			if(this.is_array) {
 				if(this.array_size > 0 && this.primitiveType != null) {
 					this.sb.append(" = new ");
 					switch(this.primitiveType) {
 						case BOOLEAN:
-							this.sb.append("boolean");
+							this.sb.append("bool");
 							break;
 						case BYTE:
 							this.sb.append("byte");
@@ -254,7 +305,7 @@ public class CppAttributeGenerator extends AttributeGenerator {
 							this.sb.append("int");
 							break;
 						case LONG:
-							this.sb.append("long");
+							this.sb.append("long long");
 							break;
 						case SHORT:
 							this.sb.append("short");
@@ -286,7 +337,7 @@ public class CppAttributeGenerator extends AttributeGenerator {
 						if(!this.is_array) {
 							this.sb.append(" = 0x00B");
 						} else {
-							this.sb.append(" = null");
+							this.sb.append(" = NULL");
 						}
 						break;
 						
@@ -319,14 +370,14 @@ public class CppAttributeGenerator extends AttributeGenerator {
 						break;
 						
 					default:
-						this.sb.append(" = null");
+						this.sb.append(" = NULL");
 						break;
 				}
 			} else if(this.complexType != null) {
 				if(this.instantiate_complex_type) {
 					this.sb.append(" = new " + this.complexType + "()");
 				} else {
-					this.sb.append(" = null");
+					this.sb.append(" = NULL");
 				}
 			}
 		}
