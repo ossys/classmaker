@@ -1,7 +1,7 @@
 package com.ossys.classmaker.dbgenerator.attributegenerator;
 
 public class MySQLAttributeGenerator extends AttributeGenerator {
-
+ 
 	public MySQLAttributeGenerator(String name) {
 		super(name);
 	}
