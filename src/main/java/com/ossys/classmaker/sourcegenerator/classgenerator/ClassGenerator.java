@@ -141,6 +141,17 @@ public class ClassGenerator implements ClassGeneratorInterface {
 		}
 		return cnt;
 	}
+	
+	public boolean save(boolean overwrite) {
+		boolean exists = new File(this.path).exists();
+		if(!exists) {
+			return save();
+		} else if(exists && overwrite) {
+			return save();
+		} else {
+			return false;
+		}
+	}
 
 	public boolean save() {
 		boolean success = false;
