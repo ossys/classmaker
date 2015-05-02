@@ -130,7 +130,7 @@ public class ClassGenerator implements ClassGeneratorInterface {
 	}
 	
 	public boolean exists() {
-		return new File(this.path + System.getProperty("file.separator") + this.name() + "." + this.extension).exists();
+		return new File(this.path).exists();
 	}
 	
 	public int getLinesOfCode() {
