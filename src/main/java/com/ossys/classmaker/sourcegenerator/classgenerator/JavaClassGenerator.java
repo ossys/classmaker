@@ -25,6 +25,7 @@ public class JavaClassGenerator extends ClassGenerator {
 	private List<JavaClassGenerator> subclasses = new ArrayList<JavaClassGenerator>();
 	private List<Enum> enums = new ArrayList<Enum>();
 	private List<String> static_code_blocks = new ArrayList<String>();
+	private List<String> static_libraries = new ArrayList<String>();
 	
 	public JavaClassGenerator(String name) {
 		super(name);
@@ -74,6 +75,10 @@ public class JavaClassGenerator extends ClassGenerator {
 		this.static_code_blocks.add(static_code_block);
 	}
 	
+	public void addStaticLibrary(String library) {
+		this.static_libraries.add(library);
+	}
+	
 	public String getSource() {
 		this.generate();
 		return this.sb.toString();
@@ -107,6 +112,14 @@ public class JavaClassGenerator extends ClassGenerator {
 				this.sb.append("\n");
 			} else {
 				this.sb.append("import " + library + ";\n");
+			}
+		}
+		
+		for(String library : this.static_libraries) {
+			if(library == null) {
+				this.sb.append("\n");
+			} else {
+				this.sb.append("import static " + library + ";\n");
 			}
 		}
 		
