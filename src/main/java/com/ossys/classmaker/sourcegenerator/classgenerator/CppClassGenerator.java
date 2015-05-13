@@ -43,7 +43,7 @@ public class CppClassGenerator extends ClassGenerator {
 	private List<Enum> enums = new ArrayList<Enum>();
 	
 	public CppClassGenerator(String name, String path) {
-		super(name,path);
+		super(name,path + System.getProperty("file.separator") + ClassGenerator.getClassName(name) + ".cpp");
 		this.root_path = path;
 	}
 	
