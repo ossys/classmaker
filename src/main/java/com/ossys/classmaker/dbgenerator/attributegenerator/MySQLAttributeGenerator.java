@@ -37,9 +37,9 @@ public class MySQLAttributeGenerator extends AttributeGenerator {
 					}
 				} else {
 					if(this.signed) {
-						sb.append(" DOUBLE(" + this.precision + "," + new Double(this.max_length).toString().length() + ") UNSIGNED");
+						sb.append(" DOUBLE(" + new Double(this.max_length).toString().length() + "," + this.precision + ") UNSIGNED");
 					} else if(!this.signed) {
-						sb.append(" DOUBLE(" + this.precision + "," + new Double(this.max_length).toString().length() + ") UNSIGNED");
+						sb.append(" DOUBLE(" + new Double(this.max_length).toString().length() + "," + this.precision + ") UNSIGNED");
 					}
 				}
 				break;
