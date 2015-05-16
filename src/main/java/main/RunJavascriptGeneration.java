@@ -14,13 +14,13 @@ public class RunJavascriptGeneration {
 		/***
 		 * Javascript Class Generation
 		 ***/
-		JavascriptClassGenerator jscg = new JavascriptClassGenerator("Javascript Class", "/Users/ccravens/dev/java/AE/results/java");
-		
-		JavascriptMethodGenerator jsmg = new JavascriptMethodGenerator("test method");
-		jsmg.addCode("\t\treturn;");
-		
-		jscg.addMethod(jsmg);
-		System.out.println(jscg.getSource());
+//		JavascriptClassGenerator jscg = new JavascriptClassGenerator("Javascript Class", "/Users/ccravens/dev/java/AE/results/java");
+//		
+//		JavascriptMethodGenerator jsmg = new JavascriptMethodGenerator("test method");
+//		jsmg.addCode("\t\treturn;");
+//		
+//		jscg.addMethod(jsmg);
+//		System.out.println(jscg.getSource());
 		
 //		if(jscg.save()) {
 //			System.out.println("Successfully Saved Javascript Class!");

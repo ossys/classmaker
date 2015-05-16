@@ -14,22 +14,22 @@ import com.ossys.classmaker.sourcegenerator.methodgenerator.JavascriptMethodGene
  */
 public class JavascriptClassGenerator extends ClassGenerator {
 
-	private List<JavascriptMethodGenerator> methods = new ArrayList<JavascriptMethodGenerator>();
+	private List<List<String>> libraries = new ArrayList<List<String>>();
+	private StringBuilder code = new StringBuilder();
 	
 	public JavascriptClassGenerator(String name) {
 		super(name);
+		this.sb = new StringBuilder();
 	}
 	
 	public JavascriptClassGenerator(String name, String path) {
 		super(name,path + System.getProperty("file.separator") + ClassGenerator.getClassName(name) + ".js");
+		this.sb = new StringBuilder();
 	}
 	
 	public JavascriptClassGenerator(String name, String path, NamingSyntaxType type) {
 		super(name,path + System.getProperty("file.separator") + ClassGenerator.getClassName(name) + ".js", type);
-	}
-	
-	public void addMethod(JavascriptMethodGenerator method) {
-		this.methods.add(method);
+		this.sb = new StringBuilder();
 	}
 	
 	public String getSource() {
@@ -37,8 +37,32 @@ public class JavascriptClassGenerator extends ClassGenerator {
 		return this.sb.toString();
 	}
 	
+	public void addMethod(JavascriptMethodGenerator jmg) {
+		this.code.append(jmg.generate());
+	}
+	
+	public void addLibrary(String var, String lib) {
+		List<String> library = new ArrayList<String>();
+		library.add(var);
+		library.add(lib);
+		this.libraries.add(library);
+	}
+	
 	private void generate() {
-		this.sb = new StringBuilder();
+		
+		for(List<String> library : this.libraries) {
+			if(library.get(0) == null || library.get(0).equals("")) {
+				this.sb.append("require('" + library.get(1) + "');\n");
+			} else {
+				this.sb.append("var " + library.get(0) + " = require('" + library.get(1) + "');\n");
+			}
+		}
+		
+		if(this.libraries.size() > 0) {
+			this.sb.append("\n");
+		}
+		
+		this.sb.append(this.code.toString());
 	}
 	
 	public boolean save() {

@@ -3,7 +3,11 @@
  */
 package com.ossys.classmaker.sourcegenerator.methodgenerator;
 
-import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator.NamingSyntaxType;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.ossys.classmaker.sourcegenerator.attributegenerator.JavascriptAttributeGenerator;
+import com.ossys.classmaker.sourcegenerator.attributegenerator.JavascriptAttributeGenerator.AttributeType;
 
 /**
  * @author Administrator
@@ -11,20 +15,70 @@ import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator.Naming
  */
 public class JavascriptMethodGenerator extends MethodGenerator {
 	
-	public JavascriptMethodGenerator() {
-		super(null);
+	public static enum MethodType {
+		ASSIGNED,
+		DECLARED,
+		CALLED,
+		ANONYMOUS
 	}
 	
-	public JavascriptMethodGenerator(String name) {
+	private StringBuilder code = new StringBuilder();
+	private List<String> args = new ArrayList<String>();
+	private MethodType type = null;
+	private String name = "";
+	
+	public JavascriptMethodGenerator(MethodType type, String name) {
 		super(name);
+		this.type = type;
+		this.name = name;
 	}
 	
-	public JavascriptMethodGenerator(String name, NamingSyntaxType type) {
-		super(name,type);
+	public void addArgument(String arg) {
+		this.args.add(arg);
 	}
 	
-	private void generate() {
-		this.sb = new StringBuilder();
+	public void addArgument(JavascriptAttributeGenerator jsag) {
+		this.args.add(jsag.generate(AttributeType.ARGUMENT));
+	}
+	
+	public void addArgument(JavascriptMethodGenerator jsmg) {
+		this.args.add(jsmg.generate());
+	}
+	
+	public void addCode(String code) {
+		this.code.append(code);
+	}
+	
+	public String generate() {
+		StringBuilder s = new StringBuilder();
+		
+		if(this.type == MethodType.CALLED) {
+			s.append(this.name + "(");
+			int cnt = 0;
+			for(String arg : this.args) {
+				if(cnt > 0) {
+					s.append(", ");
+				}
+				s.append(arg);
+				cnt++;
+			}
+			s.append(");\n\n");
+		} else if(this.type == MethodType.ANONYMOUS) {
+			s.append("function(");
+			int cnt = 0;
+			for(String arg : this.args) {
+				if(cnt > 0) {
+					s.append(", ");
+				}
+				s.append(arg);
+				cnt++;
+			}
+			s.append(") {\n");
+			s.append(this.code.toString() + "\n");
+			s.append("}");
+		}
+		
+		return s.toString();
 	}
 	
 }
