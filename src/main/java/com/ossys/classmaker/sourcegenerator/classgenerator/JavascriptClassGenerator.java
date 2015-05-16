@@ -14,6 +14,7 @@ import com.ossys.classmaker.sourcegenerator.methodgenerator.JavascriptMethodGene
  */
 public class JavascriptClassGenerator extends ClassGenerator {
 
+	private int methods_cnt = 0;
 	private List<List<String>> libraries = new ArrayList<List<String>>();
 	private StringBuilder code = new StringBuilder();
 	
@@ -38,6 +39,10 @@ public class JavascriptClassGenerator extends ClassGenerator {
 	}
 	
 	public void addMethod(JavascriptMethodGenerator jmg) {
+		if(this.methods_cnt > 0) {
+			this.code.append("\n\n");
+		}
+		this.methods_cnt++;
 		this.code.append(jmg.generate());
 	}
 	

@@ -26,6 +26,7 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 	private List<String> args = new ArrayList<String>();
 	private MethodType type = null;
 	private String name = "";
+	private int tab_level = 0;
 	
 	public JavascriptMethodGenerator(MethodType type, String name) {
 		super(name);
@@ -45,14 +46,34 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 		this.args.add(jsmg.generate());
 	}
 	
+	public void addTabLevel() {
+		this.tab_level++;
+	}
+	
+	public int getTabLevel() {
+		return this.tab_level;
+	}
+	
+	public void setTabLevel(int tab_level) {
+		this.tab_level = tab_level;
+	}
+	
 	public void addCode(String code) {
 		this.code.append(code);
+	}
+	
+	public void addCode(JavascriptMethodGenerator jsmg) {
+		jsmg.addTabLevel();
+		this.code.append(jsmg.generate());
 	}
 	
 	public String generate() {
 		StringBuilder s = new StringBuilder();
 		
 		if(this.type == MethodType.CALLED) {
+			for(int i=0; i<this.tab_level; i++) {
+				s.append("\t");
+			}
 			s.append(this.name + "(");
 			int cnt = 0;
 			for(String arg : this.args) {
@@ -62,7 +83,7 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				s.append(arg);
 				cnt++;
 			}
-			s.append(");\n\n");
+			s.append(");");
 		} else if(this.type == MethodType.ANONYMOUS) {
 			s.append("function(");
 			int cnt = 0;
@@ -75,6 +96,10 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 			}
 			s.append(") {\n");
 			s.append(this.code.toString() + "\n");
+
+			for(int i=0; i<this.tab_level; i++) {
+				s.append("\t");
+			}
 			s.append("}");
 		}
 		
