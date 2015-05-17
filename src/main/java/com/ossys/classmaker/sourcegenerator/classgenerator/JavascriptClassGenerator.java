@@ -53,6 +53,10 @@ public class JavascriptClassGenerator extends ClassGenerator {
 		this.libraries.add(library);
 	}
 	
+	public void addCode(String code) {
+		this.code.append(code);
+	}
+	
 	private void generate() {
 		
 		for(List<String> library : this.libraries) {
