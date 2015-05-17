@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.ossys.classmaker.sourcegenerator.attributegenerator.JavascriptAttributeGenerator;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.JavascriptAttributeGenerator.AttributeType;
+import com.ossys.classmaker.sourcegenerator.attributegenerator.JavascriptAttributeGenerator.PrimitiveType;
 
 /**
  * @author Administrator
@@ -17,6 +18,7 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 	
 	public static enum MethodType {
 		ASSIGNED,
+		INSTANTIATED,
 		DECLARED,
 		CALLED,
 		ANONYMOUS
@@ -25,11 +27,19 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 	private StringBuilder code = new StringBuilder();
 	private List<String> args = new ArrayList<String>();
 	private MethodType type = null;
-	private String name = "";
+	private String var = null;
+	private String name = null;
 	private int tab_level = 0;
 	
 	public JavascriptMethodGenerator(MethodType type, String name) {
 		super(name);
+		this.type = type;
+		this.name = name;
+	}
+	
+	public JavascriptMethodGenerator(MethodType type, String var, String name) {
+		super(name);
+		this.var = var;
 		this.type = type;
 		this.name = name;
 	}
@@ -70,11 +80,19 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 	public String generate() {
 		StringBuilder s = new StringBuilder();
 		
-		if(this.type == MethodType.CALLED) {
+		if(this.type == MethodType.CALLED || this.type == MethodType.INSTANTIATED || this.type == MethodType.ASSIGNED) {
 			for(int i=0; i<this.tab_level; i++) {
 				s.append("\t");
 			}
+			
+			if(this.type == MethodType.INSTANTIATED || this.type == MethodType.ASSIGNED) {
+				s.append("var " + this.var + " = ");
+				if(this.type == MethodType.INSTANTIATED) {
+					s.append("new ");
+				}
+			}
 			s.append(this.name + "(");
+			
 			int cnt = 0;
 			for(String arg : this.args) {
 				if(cnt > 0) {
