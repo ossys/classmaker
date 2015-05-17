@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator;
 import com.ossys.classmaker.sourcegenerator.methodgenerator.JavascriptMethodGenerator;
+import com.ossys.classmaker.sourcegenerator.methodgenerator.JavascriptMethodGenerator.MethodType;
 
 /**
  * @author Administrator
@@ -29,8 +30,7 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 	private PrimitiveType primitiveType = null;
 	
 	public static enum AttributeType {
-		CLASS,
-		INTERFACE,
+		MEMBER,
 		ARGUMENT
 	}
 	
@@ -93,9 +93,9 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 		}
 	}
 	
-	public void add(String name, JavascriptMethodGenerator value) {
+	public void add(String name, JavascriptAttributeGenerator value) {
 		if(this.primitiveType == PrimitiveType.OBJECT) {
-			this.values.put(name, value.generate());
+			this.values.put(name, value.generate(AttributeType.MEMBER));
 		}
 	}
 	
@@ -104,7 +104,7 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 			this.sb.append("'" + this.name + "'");
 		} else if(this.name != null && type == AttributeType.ARGUMENT) {
 			this.sb.append(this.name);
-		} else if(type == AttributeType.ARGUMENT && this.primitiveType == PrimitiveType.OBJECT) {
+		} else if((type == AttributeType.MEMBER || type == AttributeType.ARGUMENT) && this.primitiveType == PrimitiveType.OBJECT) {
 			this.sb.append("{");
 			if(this.tabbed) {
 				this.sb.append("\n");
@@ -130,7 +130,12 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 		        this.sb.append(pair.getKey() + " : " + pair.getValue());
 				cnt++;
 		    }
-		    this.sb.append("\n}");
+		    if(this.tabbed) {
+		    	this.sb.append("\n");
+		    } else {
+		    	this.sb.append(" ");
+		    }
+		    this.sb.append("}");
 		}
 		
 		String ret = this.sb.toString();
