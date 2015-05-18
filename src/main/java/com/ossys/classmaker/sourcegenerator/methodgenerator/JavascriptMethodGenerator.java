@@ -166,7 +166,10 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 			for(int i=0; i<this.tab_level; i++) {
 				s.append("\t");
 			}
-			s.append("};\n");
+			s.append("}");
+			if(this.type == MethodType.MEMBER) {
+				s.append(";\n\n");
+			}
 			
 			if(this.type == MethodType.DECLARED) {
 				for(JavascriptMethodGenerator jsmg : this.methods) {
