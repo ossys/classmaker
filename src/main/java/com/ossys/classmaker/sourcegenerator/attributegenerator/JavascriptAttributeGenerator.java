@@ -155,7 +155,7 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 					this.sb.append(";");
 				}
 			} else {
-				this.sb.append(";");
+				this.sb.append(" = null;");
 			}
 		}
 		

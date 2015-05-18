@@ -146,6 +146,9 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				cnt++;
 			}
 			s.append(") {");
+			if(this.type == MethodType.DECLARED) {
+				s.append("\n");
+			}
 			
 			for(JavascriptAttributeGenerator jsag : this.attributes) {
 				s.append("\t" + jsag.generate(AttributeType.MEMBER) + "\n");
@@ -167,7 +170,7 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				s.append("\t");
 			}
 			s.append("}");
-			if(this.type == MethodType.MEMBER) {
+			if(this.type == MethodType.MEMBER || this.type == MethodType.ASSIGNED) {
 				s.append(";\n\n");
 			}
 			
