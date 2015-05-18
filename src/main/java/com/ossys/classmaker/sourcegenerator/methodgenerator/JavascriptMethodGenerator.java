@@ -102,8 +102,12 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				cnt++;
 			}
 			s.append(");");
-		} else if(this.type == MethodType.ANONYMOUS) {
-			s.append("function(");
+		} else if(this.type == MethodType.DECLARED || this.type == MethodType.ANONYMOUS) {
+			s.append("function");
+			if(this.type == MethodType.DECLARED) {
+				s.append(" " + this.name);
+			}
+			s.append("(");
 			int cnt = 0;
 			for(String arg : this.args) {
 				if(cnt > 0) {
@@ -118,7 +122,7 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 			for(int i=0; i<this.tab_level; i++) {
 				s.append("\t");
 			}
-			s.append("}");
+			s.append("};");
 		}
 		
 		return s.toString();

@@ -38,12 +38,12 @@ public class JavascriptClassGenerator extends ClassGenerator {
 		return this.sb.toString();
 	}
 	
-	public void addMethod(JavascriptMethodGenerator jmg) {
+	public void addMethod(JavascriptMethodGenerator jsmg) {
 		if(this.methods_cnt > 0) {
 			this.code.append("\n\n");
 		}
 		this.methods_cnt++;
-		this.code.append(jmg.generate());
+		this.code.append(jsmg.generate());
 	}
 	
 	public void addLibrary(String var, String lib) {

@@ -135,6 +135,9 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 		    } else {
 		    	this.sb.append(" ");
 		    }
+		    for(int i=0; i<this.tab_level-1; i++) {
+		    	this.sb.append("\t");
+		    }
 		    this.sb.append("}");
 		}
 		
