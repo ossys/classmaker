@@ -6,6 +6,7 @@ package com.ossys.classmaker.sourcegenerator.methodgenerator;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ossys.classmaker.sourcegenerator.attributegenerator.JavaAttributeGenerator;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.JavascriptAttributeGenerator;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.JavascriptAttributeGenerator.AttributeType;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.JavascriptAttributeGenerator.PrimitiveType;
@@ -21,9 +22,13 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 		INSTANTIATED,
 		DECLARED,
 		CALLED,
-		ANONYMOUS
+		ANONYMOUS,
+		PROTOTYPED,
+		MEMBER
 	}
 	
+	private List<JavascriptAttributeGenerator> attributes = new ArrayList<JavascriptAttributeGenerator>();
+	private List<JavascriptMethodGenerator> methods = new ArrayList<JavascriptMethodGenerator>();
 	private StringBuilder code = new StringBuilder();
 	private List<String> args = new ArrayList<String>();
 	private MethodType type = null;
@@ -64,6 +69,10 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 		return this.tab_level;
 	}
 	
+	public MethodType getType() {
+		return this.type;
+	}
+	
 	public void setTabLevel(int tab_level) {
 		this.tab_level = tab_level;
 	}
@@ -75,6 +84,15 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 	public void addCode(JavascriptMethodGenerator jsmg) {
 		jsmg.addTabLevel();
 		this.code.append(jsmg.generate());
+	}
+	
+	public void addAttribute(JavascriptAttributeGenerator jsag) {
+		this.attributes.add(jsag);
+	}
+	
+	public void addMethod(JavascriptMethodGenerator jsmg) {
+		jsmg.setTabLevel(this.tab_level+1);
+		this.methods.add(jsmg);
 	}
 	
 	public String generate() {
@@ -101,8 +119,19 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				s.append(arg);
 				cnt++;
 			}
-			s.append(");");
-		} else if(this.type == MethodType.DECLARED || this.type == MethodType.ANONYMOUS) {
+			s.append(");\n");
+		} else if(this.type == MethodType.MEMBER || this.type == MethodType.PROTOTYPED || this.type == MethodType.DECLARED || this.type == MethodType.ANONYMOUS) {
+			for(int i=0; i<this.tab_level; i++) {
+				s.append("\t");
+			}
+			
+			if(this.type == MethodType.MEMBER && this.visibilityType == MethodVisibilityType.PRIVATE) {
+				s.append("var " + this.name + " = ");
+			} else if(this.type == MethodType.MEMBER && (this.visibilityType == MethodVisibilityType.PUBLIC || this.visibilityType == MethodVisibilityType.PRIVILEGED)) {
+				s.append("this." + this.name + " = ");
+			}else if(this.type == MethodType.PROTOTYPED) {
+				s.append(this.var + ".prototype." + this.name + " = ");
+			}
 			s.append("function");
 			if(this.type == MethodType.DECLARED) {
 				s.append(" " + this.name);
@@ -116,13 +145,36 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				s.append(arg);
 				cnt++;
 			}
-			s.append(") {\n");
-			s.append(this.code.toString() + "\n");
+			s.append(") {");
+			
+			for(JavascriptAttributeGenerator jsag : this.attributes) {
+				s.append("\t" + jsag.generate(AttributeType.MEMBER) + "\n");
+			}
+			
+			if(this.code.length() > 0) {
+				s.append("\n" + this.code.toString() + "\n");
+			}
+			
+			if(this.type == MethodType.DECLARED) {
+				for(JavascriptMethodGenerator jsmg : this.methods) {
+					if(jsmg.getVisibilityType() == MethodVisibilityType.PRIVATE || jsmg.getVisibilityType() == MethodVisibilityType.PRIVILEGED) {
+						s.append(jsmg.generate());
+					}
+				}
+			}
 
 			for(int i=0; i<this.tab_level; i++) {
 				s.append("\t");
 			}
-			s.append("};");
+			s.append("};\n");
+			
+			if(this.type == MethodType.DECLARED) {
+				for(JavascriptMethodGenerator jsmg : this.methods) {
+					if(jsmg.getVisibilityType() == MethodVisibilityType.PUBLIC && jsmg.getType() == MethodType.PROTOTYPED) {
+						s.append(jsmg.generate());
+					}
+				}
+			}
 		}
 		
 		return s.toString();

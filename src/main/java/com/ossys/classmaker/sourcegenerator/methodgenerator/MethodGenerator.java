@@ -30,7 +30,8 @@ public class MethodGenerator implements MethodGeneratorInterface {
 	public static enum MethodVisibilityType {
 		PRIVATE,
 		PROTECTED,
-		PUBLIC
+		PUBLIC,
+		PRIVILEGED
 	}
 	protected MethodVisibilityType visibilityType = null;
 	

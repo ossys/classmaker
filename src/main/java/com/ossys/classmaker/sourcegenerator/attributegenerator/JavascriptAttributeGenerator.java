@@ -8,8 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator;
-import com.ossys.classmaker.sourcegenerator.methodgenerator.JavascriptMethodGenerator;
-import com.ossys.classmaker.sourcegenerator.methodgenerator.JavascriptMethodGenerator.MethodType;
 
 /**
  * @author Administrator
@@ -30,8 +28,9 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 	private PrimitiveType primitiveType = null;
 	
 	public static enum AttributeType {
-		MEMBER,
-		ARGUMENT
+		VALUE,
+		ARGUMENT,
+		MEMBER
 	}
 	
 	private int tab_level = 0;
@@ -95,7 +94,7 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 	
 	public void add(String name, JavascriptAttributeGenerator value) {
 		if(this.primitiveType == PrimitiveType.OBJECT) {
-			this.values.put(name, value.generate(AttributeType.MEMBER));
+			this.values.put(name, value.generate(AttributeType.VALUE));
 		}
 	}
 	
@@ -104,7 +103,7 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 			this.sb.append("'" + this.name + "'");
 		} else if(this.name != null && type == AttributeType.ARGUMENT) {
 			this.sb.append(this.name);
-		} else if((type == AttributeType.MEMBER || type == AttributeType.ARGUMENT) && this.primitiveType == PrimitiveType.OBJECT) {
+		} else if((type == AttributeType.VALUE || type == AttributeType.ARGUMENT) && this.primitiveType == PrimitiveType.OBJECT) {
 			this.sb.append("{");
 			if(this.tabbed) {
 				this.sb.append("\n");
@@ -139,10 +138,31 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 		    	this.sb.append("\t");
 		    }
 		    this.sb.append("}");
+		} else if(type == AttributeType.MEMBER) {
+			if(this.visibilityType == AttributeVisibilityType.PRIVATE) {
+				this.sb.append("var ");
+			} else if(this.visibilityType == AttributeVisibilityType.PUBLIC) {
+				this.sb.append("this.");
+			}
+			this.sb.append(this.name);
+			
+			if(this.dflt != null) {
+				if(this.primitiveType == PrimitiveType.STRING) {
+					this.sb.append(" = '" + this.dflt + "';");
+				} else if(!this.dflt.equals("")) {
+					this.sb.append(" = " + this.dflt + ";");
+				} else {
+					this.sb.append(";");
+				}
+			} else {
+				this.sb.append(";");
+			}
 		}
 		
 		String ret = this.sb.toString();
-		this.sb.delete(0, this.sb.length()-1);
+		if(this.sb.length() > 0) {
+			this.sb.delete(0, this.sb.length()-1);
+		}
 		return ret;
 	}
 	

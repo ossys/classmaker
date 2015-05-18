@@ -17,6 +17,7 @@ public class JavascriptClassGenerator extends ClassGenerator {
 	private int methods_cnt = 0;
 	private List<List<String>> libraries = new ArrayList<List<String>>();
 	private StringBuilder code = new StringBuilder();
+	private String exports = null;
 	
 	public JavascriptClassGenerator(String name) {
 		super(name);
@@ -57,6 +58,10 @@ public class JavascriptClassGenerator extends ClassGenerator {
 		this.code.append(code);
 	}
 	
+	public void exports(String export) {
+		this.exports = export;
+	}
+	
 	private void generate() {
 		
 		for(List<String> library : this.libraries) {
@@ -72,6 +77,10 @@ public class JavascriptClassGenerator extends ClassGenerator {
 		}
 		
 		this.sb.append(this.code.toString());
+		
+		if(this.exports != null) {
+			this.sb.append("\nmodule.exports = " + this.exports + ";");
+		}
 	}
 	
 	public boolean save() {
