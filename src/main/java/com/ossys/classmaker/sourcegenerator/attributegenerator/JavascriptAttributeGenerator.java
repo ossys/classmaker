@@ -70,6 +70,10 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 		this.primitiveType = primitiveType;
 	}
 	
+	public void setDefault(JavascriptAttributeGenerator jsag) {
+		this.dflt = jsag.generate(AttributeType.ARGUMENT);
+	}
+	
 	public PrimitiveType getType() {
 		return this.primitiveType;
 	}
