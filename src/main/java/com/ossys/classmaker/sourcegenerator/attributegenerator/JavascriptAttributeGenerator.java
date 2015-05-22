@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator;
+import com.ossys.classmaker.sourcegenerator.methodgenerator.JavascriptMethodGenerator;
 
 /**
  * @author Administrator
@@ -37,6 +38,8 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 	private boolean tabbed = false;
 	private StringBuilder sb = new StringBuilder();
 	private Map<String, String> values = new LinkedHashMap<String, String>();
+	
+	private JavascriptMethodGenerator parent = null;
 	
 	public JavascriptAttributeGenerator(String name) {
 		super(name);
@@ -72,6 +75,10 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 	
 	public void setDefault(JavascriptAttributeGenerator jsag) {
 		this.dflt = jsag.generate(AttributeType.ARGUMENT);
+	}
+	
+	public void setParent(JavascriptMethodGenerator parent) {
+		this.parent = parent;
 	}
 	
 	public PrimitiveType getType() {
@@ -146,13 +153,19 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 			if(this.visibilityType == AttributeVisibilityType.PRIVATE) {
 				this.sb.append("var ");
 			} else if(this.visibilityType == AttributeVisibilityType.PUBLIC) {
-				this.sb.append("this.");
+				if(this.stc && this.parent != null) {
+					this.sb.append(this.parent.getName() + ".");
+				} else {
+					this.sb.append("this.");
+				}
 			}
 			this.sb.append(this.name);
 			
 			if(this.dflt != null) {
 				if(this.primitiveType == PrimitiveType.STRING) {
 					this.sb.append(" = '" + this.dflt + "';");
+				} else if(this.primitiveType == PrimitiveType.ENUM) {
+					this.sb.append(" = Object.freeze(" + this.dflt + ");");
 				} else if(!this.dflt.equals("")) {
 					this.sb.append(" = " + this.dflt + ";");
 				} else {

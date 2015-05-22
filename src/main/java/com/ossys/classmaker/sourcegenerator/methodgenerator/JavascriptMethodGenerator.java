@@ -8,8 +8,10 @@ import java.util.List;
 
 import com.ossys.classmaker.sourcegenerator.attributegenerator.JavaAttributeGenerator;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.JavascriptAttributeGenerator;
+import com.ossys.classmaker.sourcegenerator.attributegenerator.AttributeGenerator.AttributeVisibilityType;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.JavascriptAttributeGenerator.AttributeType;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.JavascriptAttributeGenerator.PrimitiveType;
+import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator;
 
 /**
  * @author Administrator
@@ -24,7 +26,8 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 		CALLED,
 		ANONYMOUS,
 		PROTOTYPED,
-		MEMBER
+		MEMBER,
+		CLASS
 	}
 	
 	private List<JavascriptAttributeGenerator> attributes = new ArrayList<JavascriptAttributeGenerator>();
@@ -120,7 +123,7 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				cnt++;
 			}
 			s.append(");\n");
-		} else if(this.type == MethodType.MEMBER || this.type == MethodType.PROTOTYPED || this.type == MethodType.DECLARED || this.type == MethodType.ANONYMOUS) {
+		} else if(this.type == MethodType.MEMBER || this.type == MethodType.PROTOTYPED || this.type == MethodType.DECLARED || this.type == MethodType.ANONYMOUS || this.type == MethodType.CLASS) {
 			for(int i=0; i<this.tab_level; i++) {
 				s.append("\t");
 			}
@@ -133,7 +136,7 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				s.append(this.var + ".prototype." + this.name + " = ");
 			}
 			s.append("function");
-			if(this.type == MethodType.DECLARED) {
+			if(this.type == MethodType.DECLARED || this.type == MethodType.CLASS) {
 				s.append(" " + this.name);
 			}
 			s.append("(");
@@ -146,19 +149,26 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				cnt++;
 			}
 			s.append(") {");
-			if(this.type == MethodType.DECLARED) {
+			if(this.type == MethodType.DECLARED || this.type == MethodType.CLASS) {
 				s.append("\n");
+				if(this.type == MethodType.CLASS) {
+					s.append("\tif (!(this instanceof " + this.name + ")) {\n");
+					s.append("\t\tthrow new TypeError(\"" + this.name + " constructor cannot be called as a function.\");\n");
+					s.append("\t}\n");
+				}
 			}
 			
 			for(JavascriptAttributeGenerator jsag : this.attributes) {
-				s.append("\t" + jsag.generate(AttributeType.MEMBER) + "\n");
+				if(!jsag.isStatic()) {
+					s.append("\t" + jsag.generate(AttributeType.MEMBER) + "\n");
+				}
 			}
 			
 			if(this.code.length() > 0) {
 				s.append("\n" + this.code.toString() + "\n");
 			}
 			
-			if(this.type == MethodType.DECLARED) {
+			if(this.type == MethodType.DECLARED || this.type == MethodType.CLASS) {
 				for(JavascriptMethodGenerator jsmg : this.methods) {
 					if(jsmg.getVisibilityType() == MethodVisibilityType.PRIVATE || jsmg.getVisibilityType() == MethodVisibilityType.PRIVILEGED) {
 						s.append(jsmg.generate());
@@ -174,7 +184,18 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				s.append(";\n\n");
 			}
 			
-			if(this.type == MethodType.DECLARED) {
+			//Static attributes
+			if(this.type == MethodType.DECLARED || this.type == MethodType.CLASS) {
+				for(JavascriptAttributeGenerator jsag : this.attributes) {
+					if(jsag.isStatic() && jsag.getVisibilityType() == AttributeVisibilityType.PUBLIC) {
+						jsag.setParent(this);
+						s.append("\n" + jsag.generate(AttributeType.MEMBER));
+					}
+				}
+			}
+			
+			//Prototyped methods
+			if(this.type == MethodType.DECLARED || this.type == MethodType.CLASS) {
 				for(JavascriptMethodGenerator jsmg : this.methods) {
 					if(jsmg.getVisibilityType() == MethodVisibilityType.PUBLIC && jsmg.getType() == MethodType.PROTOTYPED) {
 						s.append(jsmg.generate());

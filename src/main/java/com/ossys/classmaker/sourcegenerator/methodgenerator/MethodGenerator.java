@@ -108,6 +108,10 @@ public class MethodGenerator implements MethodGeneratorInterface {
 		this.name = name;
 	}
 	
+	public String getName() {
+		return this.name;
+	}
+	
 	public String name() {
 		return ClassGenerator.getName(this.name, this.namingSyntaxType, false);
 	}
