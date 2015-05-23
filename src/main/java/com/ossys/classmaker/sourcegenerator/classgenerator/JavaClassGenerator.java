@@ -111,7 +111,9 @@ public class JavaClassGenerator extends ClassGenerator {
 			if(library == null) {
 				this.sb.append("\n");
 			} else {
-				this.sb.append("import " + library + ";\n");
+				if(!library.equals("")) {
+					this.sb.append("import " + library + ";\n");
+				}
 			}
 		}
 		
