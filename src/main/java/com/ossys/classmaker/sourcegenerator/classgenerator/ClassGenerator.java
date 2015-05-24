@@ -184,6 +184,10 @@ public class ClassGenerator implements ClassGeneratorInterface {
 	public static String getName(String name, ClassGenerator.NamingSyntaxType type, boolean plural) {
 		StringBuilder sb = new StringBuilder();
 		
+		System.out.print(">>>>>> BEFORE: " + name + ", AFTER: ");
+		name = name.replaceAll("[^A-Za-z0-9\\s]", "");
+		System.out.println(name);
+		
 		if(name != null && name.length() > 0) {
 			String[] parts = name.split(" ");
 			int cnt = 0;

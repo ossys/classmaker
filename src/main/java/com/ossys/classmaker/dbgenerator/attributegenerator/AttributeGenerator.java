@@ -2,6 +2,9 @@ package com.ossys.classmaker.dbgenerator.attributegenerator;
 
 import java.util.ArrayList;
 
+import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator;
+import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator.NamingSyntaxType;
+
 public class AttributeGenerator {
 
 	protected String name = "";
@@ -80,20 +83,7 @@ public class AttributeGenerator {
 	}
 	
 	public static String getAttributeName(String name) {
-		StringBuilder sb = new StringBuilder();
-		
-		String[] parts = name.split(" ");
-		int cnt = 0;
-		
-		for(String s : parts) {
-			if(cnt > 0) {
-				sb.append("_");
-			}
-			sb.append(s.toLowerCase());
-			cnt++;
-		}
-		
-		return sb.toString();
+		return ClassGenerator.getName(name, NamingSyntaxType.LOWERCASE, false);
 	}
 	
 }
