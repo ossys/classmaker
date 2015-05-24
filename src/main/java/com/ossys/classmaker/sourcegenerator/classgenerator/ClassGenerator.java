@@ -184,7 +184,7 @@ public class ClassGenerator implements ClassGeneratorInterface {
 	public static String getName(String name, ClassGenerator.NamingSyntaxType type, boolean plural) {
 		StringBuilder sb = new StringBuilder();
 		
-		name = name.replaceAll("[^A-Za-z0-9\\s]", "");
+		name = name.replaceAll("[^A-Za-z0-9\\s_]", "");
 		
 		if(name != null && name.length() > 0) {
 			String[] parts = name.split(" ");
