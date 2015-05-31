@@ -185,7 +185,7 @@ public class ClassGenerator implements ClassGeneratorInterface {
 		StringBuilder sb = new StringBuilder();
 		
 		if(name != null && name.length() > 0) {
-			name = name.replaceAll("[^A-Za-z0-9\\s_]", "");
+			name = name.replaceAll("[^A-Za-z0-9\\s_\\.]", "");
 			
 			String[] parts = name.split(" ");
 			int cnt = 0;

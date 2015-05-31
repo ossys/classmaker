@@ -40,6 +40,7 @@ public class JavaAttributeGenerator extends AttributeGenerator {
 	private List<String> annotations = null;
 	private List<String> generics = null;
 	private List<String> instantiation_parameters = null;
+	private List<String> default_list = null;
 	
 	private boolean instantiate_complex_type = false;
 	private String complex_instantiator = null;
@@ -74,6 +75,10 @@ public class JavaAttributeGenerator extends AttributeGenerator {
 	
 	public void setComplexInstantiator(String complex_instantiator) {
 		this.complex_instantiator = complex_instantiator;
+	}
+	
+	public void setDefaultList(List<String> default_list) {
+		this.default_list = default_list;
 	}
 	
 	public void addAnnotation(String annotation) {
@@ -266,6 +271,21 @@ public class JavaAttributeGenerator extends AttributeGenerator {
 							break;
 					}
 					sb.append("[" + this.array_size + "]");
+				} else if(this.primitiveType != null && this.default_list != null) {
+					sb.append(" = {");
+					int cnt = 0;
+					for(String dflt : this.default_list) {
+						if(cnt > 0) {
+							sb.append(", ");
+						}
+						if(this.primitiveType == PrimitiveType.CHAR) {
+							sb.append("'" + dflt + "'");
+						} else {
+							sb.append(dflt);
+						}
+						cnt++;
+					}
+					sb.append("}");
 				} else {
 					sb.append(";");
 				}
