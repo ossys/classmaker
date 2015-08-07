@@ -94,7 +94,9 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 	}
 	
 	public void addMethod(JavascriptMethodGenerator jsmg) {
-		jsmg.setTabLevel(this.tab_level+1);
+		if(jsmg.getType() != MethodType.PROTOTYPED) {
+			jsmg.setTabLevel(this.tab_level+1);
+		}
 		this.methods.add(jsmg);
 	}
 	
@@ -184,8 +186,17 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				s.append("\t");
 			}
 			s.append("}");
-			if(this.type == MethodType.MEMBER || this.type == MethodType.ASSIGNED) {
+			if(this.type == MethodType.MEMBER || this.type == MethodType.ASSIGNED || this.type == MethodType.DECLARED) {
 				s.append(";\n\n");
+			}
+			
+			//Prototyped methods
+			if(this.type == MethodType.DECLARED || this.type == MethodType.CLASS) {
+				for(JavascriptMethodGenerator jsmg : this.methods) {
+					if(jsmg.getVisibilityType() == MethodVisibilityType.PUBLIC && jsmg.getType() == MethodType.PROTOTYPED) {
+						s.append(jsmg.generate() + ";\n\n");
+					}
+				}
 			}
 			
 			//Static attributes
@@ -194,15 +205,6 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 					if(jsag.isStatic() && jsag.getVisibilityType() == AttributeVisibilityType.PUBLIC) {
 						jsag.setParent(this);
 						s.append("\n" + jsag.generate(AttributeType.MEMBER));
-					}
-				}
-			}
-			
-			//Prototyped methods
-			if(this.type == MethodType.DECLARED || this.type == MethodType.CLASS) {
-				for(JavascriptMethodGenerator jsmg : this.methods) {
-					if(jsmg.getVisibilityType() == MethodVisibilityType.PUBLIC && jsmg.getType() == MethodType.PROTOTYPED) {
-						s.append(jsmg.generate());
 					}
 				}
 			}
