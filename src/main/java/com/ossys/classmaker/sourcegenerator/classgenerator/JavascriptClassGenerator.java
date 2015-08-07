@@ -4,7 +4,11 @@
 package com.ossys.classmaker.sourcegenerator.classgenerator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.ossys.classmaker.sourcegenerator.methodgenerator.JavascriptMethodGenerator;
 
@@ -18,7 +22,7 @@ public class JavascriptClassGenerator extends ClassGenerator {
 	private List<List<String>> libraries = new ArrayList<List<String>>();
 	private StringBuilder code = new StringBuilder();
 	private String exports = null;
-	
+
 	public JavascriptClassGenerator(String name) {
 		super(name);
 		this.sb = new StringBuilder();

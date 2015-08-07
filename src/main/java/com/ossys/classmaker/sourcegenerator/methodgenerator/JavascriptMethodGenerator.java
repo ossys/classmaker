@@ -107,7 +107,11 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 			}
 			
 			if(this.type == MethodType.INSTANTIATED || this.type == MethodType.ASSIGNED) {
-				s.append("var " + this.var + " = ");
+				if(this.type == MethodType.ASSIGNED && this.visibilityType == MethodVisibilityType.PUBLIC) {
+					s.append("this." + this.var + " = ");
+				} else {
+					s.append("var " + this.var + " = ");
+				}
 				if(this.type == MethodType.INSTANTIATED) {
 					s.append("new ");
 				}

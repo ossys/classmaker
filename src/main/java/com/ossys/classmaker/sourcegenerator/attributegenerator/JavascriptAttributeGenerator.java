@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator;
+import com.ossys.classmaker.sourcegenerator.classgenerator.JavascriptClassGenerator;
 import com.ossys.classmaker.sourcegenerator.methodgenerator.JavascriptMethodGenerator;
 
 /**
@@ -115,13 +116,16 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 		} else if(this.name != null && type == AttributeType.ARGUMENT) {
 			this.sb.append(this.name);
 		} else if((type == AttributeType.VALUE || type == AttributeType.ARGUMENT) && this.primitiveType == PrimitiveType.OBJECT) {
+			if(this.name != null) {
+				this.sb.append("var " + this.name + " = ");
+			}
 			this.sb.append("{");
 			if(this.tabbed) {
 				this.sb.append("\n");
 			} else {
 				this.sb.append(" ");
 			}
-			
+		
 			int cnt=0;
 		    Iterator<Map.Entry<String, String>> it = values.entrySet().iterator();
 		    while (it.hasNext()) {
