@@ -42,6 +42,10 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 	
 	private JavascriptMethodGenerator parent = null;
 	
+	public JavascriptAttributeGenerator() {
+		super(null);
+	}
+	
 	public JavascriptAttributeGenerator(String name) {
 		super(name);
 	}

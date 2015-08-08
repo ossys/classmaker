@@ -109,7 +109,9 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 			}
 			
 			if(this.type == MethodType.INSTANTIATED || this.type == MethodType.ASSIGNED) {
-				if(this.type == MethodType.ASSIGNED && this.visibilityType == MethodVisibilityType.PUBLIC) {
+				if(this.isStatic()) {
+					s.append(this.var + " = ");
+				} else if(this.type == MethodType.ASSIGNED && this.visibilityType == MethodVisibilityType.PUBLIC) {
 					s.append("this." + this.var + " = ");
 				} else {
 					s.append("var " + this.var + " = ");
@@ -128,7 +130,10 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				s.append(arg);
 				cnt++;
 			}
-			s.append(");\n");
+			s.append(")");
+			if(!this.isStatic()) {
+				s.append(";\n");
+			}
 		} else if(this.type == MethodType.MEMBER || this.type == MethodType.PROTOTYPED || this.type == MethodType.DECLARED || this.type == MethodType.ANONYMOUS || this.type == MethodType.CLASS) {
 			for(int i=0; i<this.tab_level; i++) {
 				s.append("\t");
