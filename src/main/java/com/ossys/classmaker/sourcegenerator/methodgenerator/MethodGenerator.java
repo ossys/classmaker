@@ -82,6 +82,10 @@ public class MethodGenerator implements MethodGeneratorInterface {
 		return this.getter;
 	}
 	
+	public boolean isStatic() {
+		return this.stc;
+	}
+	
 	public void addCode(String code) {
 		this.code.append(code);
 	}

@@ -94,7 +94,7 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 	}
 	
 	public void addMethod(JavascriptMethodGenerator jsmg) {
-		if(jsmg.getType() != MethodType.PROTOTYPED) {
+		if(jsmg.getType() != MethodType.PROTOTYPED && !jsmg.isStatic()) {
 			jsmg.setTabLevel(this.tab_level+1);
 		}
 		this.methods.add(jsmg);
@@ -138,11 +138,13 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				s.append("var " + this.name + " = ");
 			} else if(this.type == MethodType.MEMBER && (this.visibilityType == MethodVisibilityType.PUBLIC || this.visibilityType == MethodVisibilityType.PRIVILEGED)) {
 				s.append("this." + this.name + " = ");
-			}else if(this.type == MethodType.PROTOTYPED) {
+			} else if(this.type == MethodType.PROTOTYPED) {
 				s.append(this.var + ".prototype." + this.name + " = ");
+			} else if(this.type == MethodType.CLASS && this.isStatic()) {
+				s.append(this.var + "." + this.name + " = ");
 			}
 			s.append("function");
-			if(this.type == MethodType.DECLARED || this.type == MethodType.CLASS) {
+			if(this.type == MethodType.DECLARED || (this.type == MethodType.CLASS && !this.isStatic())) {
 				s.append(" " + this.name);
 			}
 			s.append("(");
@@ -155,7 +157,7 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				cnt++;
 			}
 			s.append(") {");
-			if(this.type == MethodType.DECLARED || this.type == MethodType.CLASS) {
+			if(this.type == MethodType.DECLARED || (this.type == MethodType.CLASS && !this.isStatic())) {
 				s.append("\n");
 				if(this.type == MethodType.CLASS) {
 					s.append("\tif (!(this instanceof " + this.name + ")) {\n");
@@ -199,7 +201,16 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				}
 			}
 			
-			//Static attributes
+			//Static methods
+			if(this.type == MethodType.DECLARED || this.type == MethodType.CLASS) {
+				for(JavascriptMethodGenerator jsmg : this.methods) {
+					if(jsmg.isStatic()) {
+						s.append(jsmg.generate() + ";\n\n");
+					}
+				}
+			}
+			
+			//Static attributes / enums
 			if(this.type == MethodType.DECLARED || this.type == MethodType.CLASS) {
 				for(JavascriptAttributeGenerator jsag : this.attributes) {
 					if(jsag.isStatic() && jsag.getVisibilityType() == AttributeVisibilityType.PUBLIC) {
