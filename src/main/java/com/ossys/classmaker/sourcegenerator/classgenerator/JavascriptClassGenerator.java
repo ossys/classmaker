@@ -70,7 +70,11 @@ public class JavascriptClassGenerator extends ClassGenerator {
 		
 		for(List<String> library : this.libraries) {
 			if(library.get(0) == null || library.get(0).equals("")) {
-				this.sb.append("require('" + library.get(1) + "');\n");
+				if(library.get(1) == null || library.get(1).equals("")) {
+					this.sb.append("\n");
+				} else {
+					this.sb.append("require('" + library.get(1) + "');\n");
+				}
 			} else {
 				this.sb.append("var " + library.get(0) + " = require('" + library.get(1) + "');\n");
 			}
