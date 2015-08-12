@@ -25,7 +25,8 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 		STRING,
 		ENUM,
 		DATE,
-		OBJECT
+		OBJECT,
+		ARRAY
 	}
 	private PrimitiveType primitiveType = null;
 	
@@ -35,6 +36,7 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 		MEMBER
 	}
 	
+	private int array_cnt = 0;
 	private int tab_level = 0;
 	private boolean tabbed = false;
 	private StringBuilder sb = new StringBuilder();
@@ -114,16 +116,28 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 		}
 	}
 	
+	public void add(JavascriptAttributeGenerator value) {
+		if(this.primitiveType == PrimitiveType.ARRAY) {
+			this.values.put(String.valueOf(this.array_cnt++), value.generate(AttributeType.VALUE));
+		}
+	}
+	
 	public String generate(AttributeType type) {
 		if(this.name != null && type == AttributeType.ARGUMENT && this.primitiveType == PrimitiveType.STRING) {
 			this.sb.append("'" + this.name + "'");
 		} else if(this.name != null && type == AttributeType.ARGUMENT) {
 			this.sb.append(this.name);
-		} else if((type == AttributeType.VALUE || type == AttributeType.ARGUMENT) && this.primitiveType == PrimitiveType.OBJECT) {
+		} else if((type == AttributeType.VALUE || type == AttributeType.ARGUMENT) && (this.primitiveType == PrimitiveType.OBJECT || this.primitiveType == PrimitiveType.ARRAY)) {
 			if(this.name != null) {
 				this.sb.append("var " + this.name + " = ");
 			}
-			this.sb.append("{");
+			
+			if(this.primitiveType == PrimitiveType.ARRAY) {
+				this.sb.append("[");
+			} else if(this.primitiveType == PrimitiveType.OBJECT) {
+				this.sb.append("{");
+			}
+			
 			if(this.tabbed) {
 				this.sb.append("\n");
 			} else {
@@ -145,7 +159,11 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 		        for(int i=0; i < this.tab_level; i++) {
 		        	this.sb.append("\t");
 		        }
-		        this.sb.append(pair.getKey() + " : " + pair.getValue());
+		        if(this.primitiveType == PrimitiveType.ARRAY) {
+		        	this.sb.append(pair.getValue());
+		        } else if(this.primitiveType == PrimitiveType.OBJECT) {
+		        	this.sb.append(pair.getKey() + " : " + pair.getValue());
+		        }
 				cnt++;
 		    }
 		    if(this.tabbed) {
@@ -156,7 +174,12 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 		    for(int i=0; i<this.tab_level-1; i++) {
 		    	this.sb.append("\t");
 		    }
-		    this.sb.append("}");
+		    
+			if(this.primitiveType == PrimitiveType.ARRAY) {
+				this.sb.append("]");
+			} else if(this.primitiveType == PrimitiveType.OBJECT) {
+				this.sb.append("}");
+			}
 		} else if(type == AttributeType.MEMBER) {
 			if(this.visibilityType == AttributeVisibilityType.PRIVATE) {
 				this.sb.append("var ");
