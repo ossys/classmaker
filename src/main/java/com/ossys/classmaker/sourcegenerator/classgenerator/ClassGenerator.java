@@ -227,7 +227,7 @@ public class ClassGenerator implements ClassGeneratorInterface {
 			}
 			
 			if(plural) {
-				if(name.substring(name.length()-1).equalsIgnoreCase("y")) {
+				if(name.substring(name.length()-1).equalsIgnoreCase("y") && !name.substring(name.length()-2).equals("ey")) {
 					if(type == NamingSyntaxType.UPPERCASE) {
 						sb.deleteCharAt(sb.length()-1);
 						sb.append("IES");
@@ -256,9 +256,9 @@ public class ClassGenerator implements ClassGeneratorInterface {
 	}
 	
 	public static String pluralize(String name) {
-		if(name.substring(name.length()-1).equals("y")) {
+		if(name.substring(name.length()-1).equals("y") && !name.substring(name.length()-2).equals("ey")) {
 			name = name.substring(0, name.length()-1) + "ies";
-		} else if(name.substring(name.length()-1).equals("Y")) {
+		} else if(name.substring(name.length()-1).equals("Y") && !name.substring(name.length()-2).equals("EY")) {
 			name = name.substring(0, name.length()-1) + "IES";
 		} else if(name.substring(name.length()-1).equals("s")) {
 			name = name.substring(0, name.length()) + "es";
