@@ -227,7 +227,7 @@ public class ClassGenerator implements ClassGeneratorInterface {
 			}
 			
 			if(plural) {
-				if(name.substring(name.length()-1).equalsIgnoreCase("y") && !name.substring(name.length()-2).equals("ey")) {
+				if(name.substring(name.length()-1).equalsIgnoreCase("y") && !name.substring(name.length()-2).equalsIgnoreCase("ey")) {
 					if(type == NamingSyntaxType.UPPERCASE) {
 						sb.deleteCharAt(sb.length()-1);
 						sb.append("IES");
