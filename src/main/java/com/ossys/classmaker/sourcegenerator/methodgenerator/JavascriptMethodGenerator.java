@@ -34,9 +34,11 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 	private List<JavascriptMethodGenerator> methods = new ArrayList<JavascriptMethodGenerator>();
 	private StringBuilder code = new StringBuilder();
 	private List<String> args = new ArrayList<String>();
+	private List<List<String>> post_export_libraries = new ArrayList<List<String>>();
 	private MethodType type = null;
 	private String var = null;
 	private String name = null;
+	private String forward_declaration = null;
 	private int tab_level = 0;
 	
 	public JavascriptMethodGenerator(MethodType type, String name) {
@@ -98,6 +100,18 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 			jsmg.setTabLevel(this.tab_level+1);
 		}
 		this.methods.add(jsmg);
+	}
+	
+	public void setForwardDeclaration(String forward_declaration) {
+		this.forward_declaration = forward_declaration;
+	}
+	
+	public void addPostExportLibrary(String var, String lib) {
+		List<String> library = new ArrayList<String>();
+		library.add(var);
+		library.add(lib);
+		System.out.println(">>>>>>>>>>>> ADDING POST EXPORT LIB: " + var + " " + lib);
+		this.post_export_libraries.add(library);
 	}
 	
 	public String generate() {
@@ -193,8 +207,33 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				s.append("\t");
 			}
 			s.append("}");
+			
 			if(this.type == MethodType.MEMBER || this.type == MethodType.ASSIGNED || this.type == MethodType.DECLARED) {
-				s.append(";\n\n");
+				s.append(";");
+				if(this.forward_declaration == null) {
+					s.append("\n\n");
+				}
+			}
+			
+			// Forward Declaration
+			if(this.forward_declaration != null) {
+				s.append("\n\nmodule.exports = " + this.forward_declaration + ";\n\n");
+			}
+
+			// Libraries to require() AFTER module.export, for cyclic dependencies
+			for(List<String> post_export_library : this.post_export_libraries) {
+				if(post_export_library.get(0) == null || post_export_library.get(0).equals("")) {
+					if(post_export_library.get(1) == null || post_export_library.get(1).equals("")) {
+						s.append("\n");
+					} else {
+						s.append("require('" + post_export_library.get(1) + "');\n");
+					}
+				} else {
+					s.append("var " + post_export_library.get(0) + " = require('" + post_export_library.get(1) + "');\n");
+				}
+			}
+			if(this.post_export_libraries.size() > 0) {
+				s.append("\n");
 			}
 			
 			//Prototyped methods
