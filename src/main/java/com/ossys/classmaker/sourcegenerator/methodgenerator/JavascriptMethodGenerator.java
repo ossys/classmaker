@@ -110,7 +110,6 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 		List<String> library = new ArrayList<String>();
 		library.add(var);
 		library.add(lib);
-		System.out.println(">>>>>>>>>>>> ADDING POST EXPORT LIB: " + var + " " + lib);
 		this.post_export_libraries.add(library);
 	}
 	
@@ -245,21 +244,21 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				}
 			}
 			
-			//Static methods
-			if(this.type == MethodType.DECLARED || this.type == MethodType.CLASS) {
-				for(JavascriptMethodGenerator jsmg : this.methods) {
-					if(jsmg.isStatic()) {
-						s.append(jsmg.generate() + ";\n\n");
-					}
-				}
-			}
-			
 			//Static attributes / enums
 			if(this.type == MethodType.DECLARED || this.type == MethodType.CLASS) {
 				for(JavascriptAttributeGenerator jsag : this.attributes) {
 					if(jsag.isStatic() && jsag.getVisibilityType() == AttributeVisibilityType.PUBLIC) {
 						jsag.setParent(this);
-						s.append("\n" + jsag.generate(AttributeType.MEMBER));
+						s.append(jsag.generate(AttributeType.MEMBER) + "\n\n");
+					}
+				}
+			}
+			
+			//Static methods
+			if(this.type == MethodType.DECLARED || this.type == MethodType.CLASS) {
+				for(JavascriptMethodGenerator jsmg : this.methods) {
+					if(jsmg.isStatic()) {
+						s.append(jsmg.generate() + ";\n\n");
 					}
 				}
 			}
