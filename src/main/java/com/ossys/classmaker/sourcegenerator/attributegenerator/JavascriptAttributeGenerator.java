@@ -180,6 +180,8 @@ public class JavascriptAttributeGenerator extends AttributeGenerator {
 			} else if(this.primitiveType == PrimitiveType.OBJECT) {
 				this.sb.append("}");
 			}
+		} else if(type == AttributeType.VALUE && (this.primitiveType == PrimitiveType.BOOLEAN || this.primitiveType == PrimitiveType.BYTE || this.primitiveType == PrimitiveType.CHAR || this.primitiveType == PrimitiveType.DATE || this.primitiveType == PrimitiveType.NUM || this.primitiveType == PrimitiveType.STRING)) {
+			this.sb.append(this.dflt);
 		} else if(type == AttributeType.MEMBER) {
 			if(this.visibilityType == AttributeVisibilityType.PRIVATE) {
 				this.sb.append("var ");

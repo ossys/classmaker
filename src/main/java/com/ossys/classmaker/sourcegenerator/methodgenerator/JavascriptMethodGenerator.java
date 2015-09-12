@@ -4,7 +4,9 @@
 package com.ossys.classmaker.sourcegenerator.methodgenerator;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.ossys.classmaker.sourcegenerator.attributegenerator.JavaAttributeGenerator;
 import com.ossys.classmaker.sourcegenerator.attributegenerator.JavascriptAttributeGenerator;
@@ -34,7 +36,7 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 	private List<JavascriptMethodGenerator> methods = new ArrayList<JavascriptMethodGenerator>();
 	private StringBuilder code = new StringBuilder();
 	private List<String> args = new ArrayList<String>();
-	private List<List<String>> post_export_libraries = new ArrayList<List<String>>();
+	private Set<List<String>> post_export_libraries = new HashSet<List<String>>();
 	private MethodType type = null;
 	private String var = null;
 	private String name = null;

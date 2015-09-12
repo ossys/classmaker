@@ -132,6 +132,10 @@ public class MethodGenerator implements MethodGeneratorInterface {
 		return ClassGenerator.getName(name, NamingSyntaxType.CAMELCASE, false);
 	}
 
+	public static String getMethodName(String name, boolean plural) {
+		return ClassGenerator.getName(name, NamingSyntaxType.CAMELCASE, plural);
+	}
+
 	public static String getPluralizedMethodName(String name) {
 		return ClassGenerator.getName(name, NamingSyntaxType.CAMELCASE, true);
 	}
