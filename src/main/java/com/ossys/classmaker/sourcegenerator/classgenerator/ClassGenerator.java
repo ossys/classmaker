@@ -228,14 +228,13 @@ public class ClassGenerator implements ClassGeneratorInterface {
 			
 			if(plural) {
 				if(name.substring(name.length()-1).equalsIgnoreCase("y") && !name.substring(name.length()-2).equalsIgnoreCase("ey")) {
+					sb.deleteCharAt(sb.length()-1);
 					if(type == NamingSyntaxType.UPPERCASE) {
-						sb.deleteCharAt(sb.length()-1);
 						sb.append("IES");
 					} else {
-						sb.deleteCharAt(sb.length()-1);
 						sb.append("ies");
 					}
-				} else if(name.substring(name.length()-1).equalsIgnoreCase("s")) {
+				} else if(name.substring(name.length()-1).equalsIgnoreCase("s") || name.substring(name.length()-1).equalsIgnoreCase("x")) {
 					if(type == NamingSyntaxType.UPPERCASE) {
 						sb.append("ES");
 					} else {
@@ -260,9 +259,9 @@ public class ClassGenerator implements ClassGeneratorInterface {
 			name = name.substring(0, name.length()-1) + "ies";
 		} else if(name.substring(name.length()-1).equals("Y") && !name.substring(name.length()-2).equals("EY")) {
 			name = name.substring(0, name.length()-1) + "IES";
-		} else if(name.substring(name.length()-1).equals("s")) {
+		} else if(name.substring(name.length()-1).equals("s") || name.substring(name.length()-1).equals("x")) {
 			name = name.substring(0, name.length()) + "es";
-		} else if(name.substring(name.length()-1).equals("S")) {
+		} else if(name.substring(name.length()-1).equals("S") || name.substring(name.length()-1).equals("X")) {
 			name = name.substring(0, name.length()) + "ES";
 		} else if(Character.isUpperCase(name.charAt(name.length()-1))) {
 			name = name.substring(0, name.length()) + "S";
