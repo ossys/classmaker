@@ -9,6 +9,7 @@ import com.ossys.classmaker.sourcegenerator.classgenerator.ClassGenerator.Naming
  * @author Administrator
  *
  */
+
 public class RubyMethodGenerator extends MethodGenerator {
 	
 	public RubyMethodGenerator() {
