@@ -42,6 +42,7 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 	private String name = null;
 	private String forward_declaration = null;
 	private int tab_level = 0;
+	private boolean is_arg = false;
 	
 	public JavascriptMethodGenerator(MethodType type, String name) {
 		super(name);
@@ -65,6 +66,7 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 	}
 	
 	public void addArgument(JavascriptMethodGenerator jsmg) {
+		jsmg.setIsArg(true);
 		this.args.add(jsmg.generate());
 	}
 	
@@ -82,6 +84,10 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 	
 	public void setTabLevel(int tab_level) {
 		this.tab_level = tab_level;
+	}
+	
+	public void setIsArg(boolean is_arg) {
+		this.is_arg = is_arg;
 	}
 	
 	public void addCode(String code) {
@@ -128,6 +134,8 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 					s.append(this.var + " = ");
 				} else if(this.type == MethodType.ASSIGNED && this.visibilityType == MethodVisibilityType.PUBLIC) {
 					s.append("this." + this.var + " = ");
+				} else if(this.type == MethodType.ASSIGNED && this.visibilityType == MethodVisibilityType.PRIVATE) {
+					s.append(this.var + " = ");
 				} else {
 					s.append("var " + this.var + " = ");
 				}
@@ -135,7 +143,11 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 					s.append("new ");
 				}
 			}
-			s.append(this.name + "(");
+			if(this.name == null) {
+				s.append("function(");
+			} else {
+				s.append(this.name + "(");
+			}
 			
 			int cnt = 0;
 			for(String arg : this.args) {
@@ -146,12 +158,24 @@ public class JavascriptMethodGenerator extends MethodGenerator {
 				cnt++;
 			}
 			s.append(")");
+			
+			if(this.methods.size() > 0) {
+				s.append(" {\n");
+				for(JavascriptMethodGenerator method : this.methods) {
+					s.append(method.generate());
+					s.append("\n");
+				}
+				s.append("}");
+			}
+			
 			if(!this.isStatic()) {
 				s.append(";\n");
 			}
 		} else if(this.type == MethodType.MEMBER || this.type == MethodType.PROTOTYPED || this.type == MethodType.DECLARED || this.type == MethodType.ANONYMOUS || this.type == MethodType.CLASS) {
-			for(int i=0; i<this.tab_level; i++) {
-				s.append("\t");
+			if(!this.is_arg) {
+				for(int i=0; i<this.tab_level; i++) {
+					s.append("\t");
+				}
 			}
 			
 			if(this.type == MethodType.MEMBER && this.visibilityType == MethodVisibilityType.PRIVATE) {

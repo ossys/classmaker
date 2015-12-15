@@ -151,5 +151,9 @@ public class AttributeGenerator implements AttributeGeneratorInterface {
 	public static String getAttributeName(String name, boolean pluralize) {
 		return ClassGenerator.getName(name, NamingSyntaxType.LOWERCASE, pluralize);
 	}
+
+	public static String getDirectoryName(String name, boolean pluralize) {
+		return name.trim().replaceAll("\\s+", " ").replaceAll("\\s", "-").replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
+	}
 	
 }
